@@ -6,15 +6,6 @@ library('tidyverse')
 library('ggplot2')
 library('lme4')
 
-# subset dataframe to include only seedlings and saplings for ABCO, PIPO, PILA, and ABMA
-trait_data1 <- trait_data[trait_data$size_class %in% c('seedling', 'sapling'), ]
-trait_data1 <- trait_data1[trait_data1$species %in% c('ABCO', 'ABMA','PIPO', 'PILA'), ]
-
-# delete columns we don't need (size_class, height_m, PARmicromol, 
-# branch_processed_2024, branch_processed_2025)
-
-trait_data1 <- trait_data1 %>% select(-height_m, -PAR_μmol, -branch_processed_2024, -branch_processed_2025)
-
 
 # make a new column turning canopy closure into a categorical variable
 trait_data1$microsite <- cut(
@@ -107,14 +98,6 @@ summary(mod3)
 trait_data1$predicted_P50 <- NA
 
 
-
-# predict missing P50 data from mod3 and include random effects from plot when predicting
-#if (nrow(P50_missing) > 0) {
- # P50_predicted_values <- predict(mod3, newdata = P50_missing, re.form = ~(1 | plot))
-#  trait_data1$predicted_P50[is.na(trait_data1$P50_combined)] <- P50_predicted_values
-#  trait_data1$predicted_P50[(trait_data1$tree_ID) %in% (P50_missing$tree_ID)] <- P50_predicted_values
-#}
-
 if (nrow(P50_missing) > 0) {
   P50_predicted_values <- predict(mod3, newdata = P50_missing, re.form = ~(1 | plot))
    trait_data1$predicted_P50[match(P50_missing$tree_ID, trait_data1$tree_ID)] <- P50_predicted_values
@@ -203,32 +186,6 @@ trait_data1$HSM_midday_combined <- trait_data1$P50_combined - trait_data1$midday
 trait_data1$HSM_predawn_P50_mean <- trait_data1$P50_complete - trait_data1$predawn_MPa_combined
 trait_data1$HSM_midday_P50_mean <- trait_data1$P50_complete - trait_data1$midday_MPa_combined
 
-# make a new dataframe that pools together 2024 and 2025 data into single trait variables
-trait_data2 <- trait_data1 %>%
-  pivot_longer(
-    cols = c(P50_MPa_2024, P50_MPa_2025,
-             HSM_predawn_2024, HSM_midday_2024,
-             HSM_predawn_2025, HSM_midday_2025,
-             predawn_MPa_2024, predawn_MPa_2025,
-             midday_MPa_2024, midday_MPa_2025),
-    names_to = c(".value", "year"),
-    names_sep = "_(?=20)"  
-  )
-
-
-# lets convert to long format again but by WP type instead of year this time 
-trait_data3 <- trait_data1 %>%
-  pivot_longer(
-    cols = c(
-      predawn_MPa_combined,
-      midday_MPa_combined,
-      P50_combined,
-      P50_complete
-    ),
-    names_to = "type",
-    values_to = "water_potential"
-  )
-
 # remove outlier tree_ID == 94
 trait_data1 <- trait_data1[trait_data1$tree_ID != 94, ]
 trait_data2 <- trait_data2[trait_data2$tree_ID != 94, ]
@@ -244,7 +201,6 @@ trait_data1$predawn_scaled <- as.numeric(scale(trait_data1$predawn_MPa_combined)
 trait_data1$P50_scaled <- as.numeric(scale(trait_data1$P50_combined))
 trait_data1$P50_mean_scaled <- as.numeric(scale(trait_data1$P50_complete))
 trait_data1$HSM_midday_P50_mean_scaled <- as.numeric(scale(trait_data1$HSM_midday_P50_mean))
-
 
 
 # we want to include a random/fixed effect for year, so lets make a column for that, including 'both'
@@ -298,15 +254,6 @@ ggplot() +
     axis.line = element_line(color = "black"),
     legend.position = "top"
   )
-
-mod4 <- lmer(P50_MPa ~ diameter_complete + canopy_closure + year + elevation_ft 
-             + (1|plot), data = )
-summary(mod4)
-
-# determine whether WP and P50 values are different between years to determine how data is pooled
-t.test(P50_MPa ~ year, data = PILA_long, paired = FALSE)
-# There is a statistically significant difference between 2024 and 2025 
-# predawn and midday water potential means. 
 
 
 P50_summary_table <- trait_data1 %>%
