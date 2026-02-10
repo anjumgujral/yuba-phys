@@ -14,20 +14,21 @@ library('tinytex')
 library('dplyr')
 library('tidyverse')
 library('ggplot2')
-library(emmeans)
-library(lme4)
-library(lmerTest)
-library(gridExtra)
-library(ggcorrplot)
-library(corrplot)
-library("ggpubr")
+library('emmeans')
+library('lme4')
+library('lmerTest')
+library('gridExtra')
+library('ggcorrplot')
+library('corrplot')
+library('ggpubr')
+library('emmeans')
 ```
 
 # load data
 ```{r}
 trait_data1<- read.csv("/Users/anjumgujral/Box Sync/yuba-phys_data/traits/yuba-phys-prepped-field-data-2024_2025.csv")
 
-# subset dataframe by species 
+# subset data frame by species 
 ABCO <- trait_data1[trait_data1$species == 'ABCO',]
 PILA <- trait_data1[trait_data1$species == 'PILA',]
 PIPO <- trait_data1[trait_data1$species == 'PIPO',]
@@ -51,8 +52,9 @@ ggplot(trait_data1, aes(x = diameter_complete, fill = size)) +
 
 ```
 
-# microsite distributions
+# site distributions
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
+
 
 ggplot(trait_data1, aes(x = diameter_complete, y = canopy_closure, color = species)) +
   geom_point(size = 3, alpha = 0.7) +
@@ -65,11 +67,7 @@ ggplot(trait_data1, aes(x = diameter_complete, y = canopy_closure, color = speci
     panel.grid.major = element_blank(), 
     panel.grid.minor = element_blank())
 
-```
-
-Distribution of microsite environments across elevation
--- how similar are microsites at high and low elevation 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# is canopy closure equal distributed across elevation bands?
 ggplot(trait_data1, aes(x = elevation, y = canopy_closure, fill = microsite)) +
   geom_boxplot() +
   labs(
@@ -82,10 +80,10 @@ ggplot(trait_data1, aes(x = elevation, y = canopy_closure, fill = microsite)) +
     panel.grid.minor = element_blank())+
   scale_fill_manual(values = c("skyblue", "lightgreen", "purple"))
 
-# Create a new variable combining size_class and elevation
+# create a new variable combining size_class and elevation
 trait_data1$size_elevation <- interaction(trait_data1$size, trait_data1$elevation)
 
-
+# are seedlings and saplings of each species equally distributed across canopy closure?
 ggplot(trait_data1, aes(x = species, y = canopy_closure)) +
   geom_boxplot(alpha = 0.5, outlier.size = 3, outlier.colour = "black") +
   geom_point(aes(color = size_elevation), 
@@ -120,12 +118,8 @@ ggplot(trait_data1, aes(x = microsite, y = canopy_closure)) +
     panel.grid.minor = element_blank()
   )
 
-```
 
-# stand basal area
-Distribution of stand basal area across elevation
--- how similar is stand density between plots at high and low elevation
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
+# how similar is stand density between plots at high and low elevation
 ggplot(trait_data1, aes(x = elevation, y = stand_basal_area, fill = elevation)) +
   geom_boxplot() +
   labs(
@@ -206,70 +200,76 @@ corrplot(cor_matrix,
          title = "Correlation Plot"
 )
 
+# There is a statistically significant difference between 2024 and 2025 predawn and midday water potential means. On average, predawn WP is higher (more negative) in 2024 and midday is 
+t.test(predawn_MPa_combined ~ year, data = trait_data1, paired = FALSE)
+
+t.test(predawn_MPa_combined ~ year, 
+       data = trait_data1, 
+       paired = FALSE,
+       subset = year %in% c("2024", "2025"))
+
 ```
 
 # table S1 models
 ```{r}
+# run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S1
+# run this model for the following response variables 'midday_MPa_combined', 'P50_combined', '
 
-mod <- lmer(internode_length_1_2~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot), data = PILA)
-summary(mod)
-
-
-mod1 <- lm(HSM_predawn_combined ~ diameter, data = ABCO)
+mod1 <- lmer(P50_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
 summary(mod1)
-
-t.test(predawn_MPa_combined ~ year, data = trait_data1, paired = FALSE)
-# There is a statistically significant difference between 2024 and 2025 predawn and midday water potential means. On average, predawn WP is higher (more negative) in 2024 and midday is 
-
-
-trait_data1$HSM_predawn_scaled <- as.numeric(scale(trait_data1$HSM_predawn))
-trait_data1$HSM_predawn_P50_mean_scaled <- as.numeric(scale(trait_data1$HSM_predawn_P50_mean))
-trait_data1$HSM_midday_P50_mean_scaled <- as.numeric(scale(trait_data1$HSM_midday_P50_mean))
-
-# run models with scaled response and predictor variables
-mod5 <- lmer(HSM_predawn_P50_mean ~DBH_complete_scaled * percent_closure_scaled * elev_indiv_scaled + (1|plot), data = PIPO)
-summary(mod5)
-
-install.packages("emmeans")
-library(emmeans)
-
-mod4 <- lmer(HSM_midday_P50_mean ~ species * diameter_complete_scaled * elev_indiv_scaled * canopy_closure_scaled + (1|plot) + (1|year), data = trait_data1)
-summary(mod4)
-
-# table 3 pairwise comparisons using emmeans
-emms1 <- emmeans(mod4, pairwise ~ species)
-summary(emms1$emmeans)
-summary(emms1$contrasts) #automatically adjusts to tukey, for multiple comparisons
-
-
-
-model <- lmer(internode_length_1_2 ~  predawn_scaled + canopy_closure_scaled + P50_scaled +(1|plot), data = PILA)
-summary(model)
-
-trait_data1$residuals <- resid(model)
 
 ```
 
 # table S2 models
 ```{r}
+# run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S2
+# run this model for the following response variables 'P50_combined', 'HSM_
 
+mod2 <- lmer(P50_combined ~diameter_complete_scaled * predawn_scaled * canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
+summary(mod2)
 
 ```
 
 # table S3 models
 ```{r}
+mod3 <- lmer(internode_length_1_2~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = ABCO)
+summary(mod3)
 
+# Fit linear model of growth on diameter
+growth_diam_mod <- lm(internode_length_1_2 ~ diameter_complete, data = trait_data1, na.action = na.exclude)
+
+# Extract residuals and add as new column
+trait_data1$growth_residuals <- residuals(growth_diam_mod)
+
+ggplot(trait_data1, aes(x = log(diameter_complete), y = log(internode_length_1_2), color = species)) +
+  geom_point(size = 3, alpha = 1) +  
+  geom_smooth(method = "lm", se = TRUE, alpha = 0.3) +  
+  labs(x = "log Diameter at root collar (cm)", y = "log Internode length (cm)") +
+  theme_bw() +
+  scale_color_manual(values = c(
+    "ABCO" = "mediumturquoise",
+    "PIPO" = "lawngreen",
+    "ABMA" = "maroon3",
+    "PILA" = "lightslateblue"
+  )) +
+  #scale_y_reverse()  +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    legend.position = "none"
+  )
 
 ```
 
-# table S4 models
+# table S4-5 models
 ```{r}
+mod4 <- lmer(HSM_midday_P50_mean ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|year), data = trait_data1)
+summary(mod4)
 
+# table 4-5 pairwise comparisons using emmeans
+emms1 <- emmeans(mod4, pairwise ~ species)
+summary(emms1$emmeans)
+summary(emms1$contrasts) #automatically adjusts to tukey, for multiple comparisons
 
 ```
 
-# table S5 models
-```{r}
-
-
-```
