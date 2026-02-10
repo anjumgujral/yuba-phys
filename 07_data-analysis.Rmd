@@ -8,11 +8,8 @@ output:
   pdf_document:
     output_dir: /Users/anjumgujral/Documents/repos/yuba-phys
 ---
-
+#load packages
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-trait_data1 <- read.csv("/Users/anjumgujral/Documents/repos/yuba-phys/trait_data1.csv")
-
-install.packages("tinytex")
 library('tinytex')
 library('dplyr')
 library('tidyverse')
@@ -21,19 +18,30 @@ library(emmeans)
 library(lme4)
 library(lmerTest)
 library(gridExtra)
+library(ggcorrplot)
+library(corrplot)
+library("ggpubr")
+```
+
+# load data
+```{r}
+trait_data1<- read.csv("/Users/anjumgujral/Box Sync/yuba-phys_data/traits/yuba-phys-prepped-field-data-2024_2025.csv")
+
+# subset dataframe by species 
+ABCO <- trait_data1[trait_data1$species == 'ABCO',]
+PILA <- trait_data1[trait_data1$species == 'PILA',]
+PIPO <- trait_data1[trait_data1$species == 'PIPO',]
+ABMA <- trait_data1[trait_data1$species == 'ABMA',]
 
 ```
 
 #size distribution
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# create a new column for size that categorizes individuals with diameter at root collar > 2.5 cm as saplings and individuals with diameter at root collar < 2.5 cm seedlings
 
-
-
-ggplot(trait_data1, aes(x = DBH_complete, fill = size)) +
+ggplot(trait_data1, aes(x = diameter_complete, fill = size)) +
   geom_histogram(binwidth = 0.5, position = "dodge", alpha = 0.7, color = "black") +
   labs( 
-       x = "Diameter at root collar (cm)", 
+       x = "Basal diameter (cm)", 
        y = "Frequency") +
   scale_fill_manual(values = c("lightblue", "lightgreen")) +
   theme_bw() +
@@ -46,11 +54,11 @@ ggplot(trait_data1, aes(x = DBH_complete, fill = size)) +
 # microsite distributions
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 
-ggplot(trait_data1, aes(x = DBH_complete, y = percent_cover, color = species)) +
+ggplot(trait_data1, aes(x = diameter_complete, y = canopy_closure, color = species)) +
   geom_point(size = 3, alpha = 0.7) +
   labs(
        y = "Canopy closure", 
-       x = "Diameter at root collar") +
+       x = "Basal diameter (cm)") +
   scale_color_manual(values = c("blue", "green", "red", "purple")) +
   theme_bw() +
   theme(
@@ -62,7 +70,7 @@ ggplot(trait_data1, aes(x = DBH_complete, y = percent_cover, color = species)) +
 Distribution of microsite environments across elevation
 -- how similar are microsites at high and low elevation 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-ggplot(trait_data1, aes(x = elevation, y = percent_cover, fill = microsite)) +
+ggplot(trait_data1, aes(x = elevation, y = canopy_closure, fill = microsite)) +
   geom_boxplot() +
   labs(
     x = "Elevation",
@@ -78,7 +86,7 @@ ggplot(trait_data1, aes(x = elevation, y = percent_cover, fill = microsite)) +
 trait_data1$size_elevation <- interaction(trait_data1$size, trait_data1$elevation)
 
 
-ggplot(trait_data1, aes(x = species, y = percent_cover)) +
+ggplot(trait_data1, aes(x = species, y = canopy_closure)) +
   geom_boxplot(alpha = 0.5, outlier.size = 3, outlier.colour = "black") +
   geom_point(aes(color = size_elevation), 
              position = position_jitter(width = 0.2, height = 0), 
@@ -95,7 +103,7 @@ ggplot(trait_data1, aes(x = species, y = percent_cover)) +
   )
 
 
-ggplot(trait_data1, aes(x = microsite, y = percent_cover)) +
+ggplot(trait_data1, aes(x = microsite, y = canopy_closure)) +
   geom_boxplot(alpha = 0.5, outlier.size = 3, outlier.colour = "black") +
   geom_point(aes(color = size_elevation), 
              position = position_jitter(width = 0.2, height = 0), 
@@ -172,18 +180,13 @@ ggplot(trait_data1, aes(x = microsite, y = stand_basal_area)) +
 # environmental variables
 ```{r}
 # Create a correlation matrix for environmental variables
-cor_matrix <- cor(trait_data1[, c("percent_cover", "elev_indiv", "stand_basal_area")], use = "pairwise.complete.obs")
+cor_matrix <- cor(trait_data1[, c("canopy_closure", "elevation_ft", "stand_basal_area")], use = "pairwise.complete.obs")
 print(cor_matrix)
 
-cor(trait_data1$elev_indiv, trait_data1$stand_basal_area, 
+cor(trait_data1$elevation_ft, trait_data1$stand_basal_area, 
     use = "complete.obs", method = "pearson")
 
-cor.test(trait_data1$stand_basal_area, trait_data1$elev_indiv, method="pearson")
-
-install.packages("ggcorrplot") 
-library(ggcorrplot)
-library(corrplot)
-library("ggpubr")
+cor.test(trait_data1$stand_basal_area, trait_data1$elevation_ft, method="pearson")
 
 # Create a custom set of axis labels (modify as per your needs)
 custom_labels <- c("Canopy Closure", "Elevation (ft)", "Stand Basal Area")
@@ -203,11 +206,9 @@ corrplot(cor_matrix,
          title = "Correlation Plot"
 )
 
-
-
 ```
 
-# stats - Table 1, 2, 3
+# table S1 models
 ```{r}
 
 mod <- lmer(internode_length_1_2~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot), data = PILA)
@@ -247,28 +248,28 @@ summary(model)
 
 trait_data1$residuals <- resid(model)
 
-
-
-
-
 ```
 
-
-# AICc model selection
+# table S2 models
 ```{r}
-install.packages('MuMIn')
-library(MuMIn)
 
-dredge_df <- na.omit(ABCO[, c("HSM_midday", "elev_indiv", "DBH_complete", "percent_cover", "plot")])
-global <- lmer(HSM_midday ~ elev_indiv * DBH_complete * percent_cover + (1|plot), data = dredge_df, na.action = na.fail)
-dredge(global)
 
-# likelihood ratio test for comparison of models by hypothesis testing versus AICc model selection
-mod6<- lmer(HSM_predawn_P50_mean_scaled ~ 1 + (1|plot), data = dredge_df)
-mod7 <- lmer(HSM_predawn_P50_mean_scaled ~elev_indiv_scaled + (1|plot), data = dredge_df)
-mod8 <- lmer(HSM_predawn_P50_mean_scaled ~DBH_complete_scaled + elev_indiv_scaled + (1|plot), data = dredge_df)
-mod9 <- lmer(HSM_predawn_P50_mean_scaled ~DBH_complete_scaled + elev_indiv_scaled + percent_closure_scaled +  (1|plot), data = dredge_df)
-
-anova(mod6, mod7, mod8, mod9)
 ```
 
+# table S3 models
+```{r}
+
+
+```
+
+# table S4 models
+```{r}
+
+
+```
+
+# table S5 models
+```{r}
+
+
+```

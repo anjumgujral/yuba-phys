@@ -5,7 +5,7 @@ date: '2026-01-18'
 output: html_document
 ---
 
-# Load packages 
+# load packages 
 ```{r}
 library(RColorBrewer)
 library(ggnewscale)
@@ -13,9 +13,20 @@ library(colorspace)
 library(gridExtra)
 ```
 
+# load data
+```{r}
+trait_data1<- read.csv("/Users/anjumgujral/Box Sync/yuba-phys_data/traits/yuba-phys-prepped-field-data-2024_2025.csv")
+
+# subset dataframe by species 
+ABCO <- trait_data1[trait_data1$species == 'ABCO',]
+PILA <- trait_data1[trait_data1$species == 'PILA',]
+PIPO <- trait_data1[trait_data1$species == 'PIPO',]
+ABMA <- trait_data1[trait_data1$species == 'ABMA',]
+
+```
+
 ```{r}
 # specify color palette 
-
 species_colors <- setNames(
   brewer.pal(4, "Dark2"),
   c("ABCO", "ABMA", "PIPO", "PILA")
@@ -53,7 +64,7 @@ for (sp in names(species_list)) {
   if (sp == "ABMA") {
     mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|year), data = df)
   } else {
-    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = df)
   }
 
   # Extract fixed-effect p-value for diameter
@@ -90,7 +101,7 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
