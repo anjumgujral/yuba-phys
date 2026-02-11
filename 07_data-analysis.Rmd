@@ -213,7 +213,7 @@ t.test(predawn_MPa_combined ~ year,
 # table S1 models
 ```{r}
 # run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S1
-# run this model for the following response variables 'midday_MPa_combined', 'P50_combined', '
+# run this model for the following response variables 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean'
 
 mod1 <- lmer(P50_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
 summary(mod1)
@@ -223,7 +223,7 @@ summary(mod1)
 # table S2 models
 ```{r}
 # run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S2
-# run this model for the following response variables 'P50_combined', 'HSM_
+# run this model for the following response variables 'P50_combined', 'HSM_midday_combined' and 'HSM_midday_P50_mean'
 
 mod2 <- lmer(P50_combined ~diameter_complete_scaled * predawn_scaled * canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
 summary(mod2)
@@ -232,7 +232,10 @@ summary(mod2)
 
 # table S3 models
 ```{r}
-mod3 <- lmer(internode_length_1_2~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = ABCO)
+# run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S3
+# run this model with HSM_midday_P50_mean_scaled as a predictor instead of P50_scaled
+
+mod3 <- lmer(internode_length_1_2~ diameter_complete_scaled + predawn_scaled + P50_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = ABCO)
 summary(mod3)
 
 # Fit linear model of growth on diameter
