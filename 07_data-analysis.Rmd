@@ -215,7 +215,7 @@ t.test(predawn_MPa_combined ~ year,
 # run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S1
 # run this model for the following response variables 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean'
 
-mod1 <- lmer(P50_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
+mod1 <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
 summary(mod1)
 
 ```
@@ -266,11 +266,16 @@ ggplot(trait_data1, aes(x = log(diameter_complete), y = log(internode_length_1_2
 
 # table S4-5 models
 ```{r}
-mod4 <- lmer(HSM_midday_P50_mean ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|year), data = trait_data1)
+# run this model for the following response variables for table S4
+mod4 <- lmer(predawn_MPa_combined ~ species + diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = trait_data1)
 summary(mod4)
 
-# table 4-5 pairwise comparisons using emmeans
-emms1 <- emmeans(mod4, pairwise ~ species)
+# run this model for the following response variables for table S5
+mod5 <- lmer(predawn_MPa_combined ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|year), data = trait_data1)
+summary(mod5)
+
+# table 5 pairwise comparisons using emmeans
+emms1 <- emmeans(mod5, pairwise ~ species)
 summary(emms1$emmeans)
 summary(emms1$contrasts) #automatically adjusts to tukey, for multiple comparisons
 
