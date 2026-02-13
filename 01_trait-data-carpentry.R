@@ -1,19 +1,14 @@
-DATADIR = "/Users/anjumgujral/Box Sync/yuba-phys_data/traits"
-trait_data <- read.csv("/Users/anjumgujral/Box Sync/yuba-phys_data/traits/yuba-phys-raw-field-data-2024_2025.csv")
 
+# load raw trait data
+trait_data1 <- read.csv("yuba-phys-raw-field-data-2024_2025.csv")
+
+# load packages
 library('dplyr')
 library('tidyverse')
 library('ggplot2')
 library('lme4')
 
-
-# make a new column turning canopy closure into a categorical variable
-trait_data1$microsite <- cut(
-  trait_data1$canopy_closure,
-  breaks = c(0, 68, 85, 100),
-  labels = c('sun', 'int', 'shade'),
-  right = TRUE
-)
+# handling missing data
 
 # create a table to summarize missing data
 missing_heights_by_species <- trait_data1 %>%
@@ -48,7 +43,7 @@ if (nrow(missing_cases) > 0) {
 trait_data1$diameter_complete <- ifelse(is.na(trait_data1$diameter_cm), trait_data1$predicted_diameter, 
                                         trait_data1$diameter_cm)
 
-# make size categorical
+# make size categorical, individuals with diameter > 2.5 cm as saplings and individuals with diameter  < 2.5 cm seedlings
 trait_data1 <- trait_data1 %>%
   mutate(size = ifelse(diameter_complete < 2.5, "seedling", "sapling"))
 
@@ -158,6 +153,16 @@ ggplot() +
   )
 
 
+# manipulating variables to be more useable
+
+# make a new column turning canopy closure into a categorical variable
+trait_data1$microsite <- cut(
+  trait_data1$canopy_closure,
+  breaks = c(0, 68, 85, 100),
+  labels = c('sun', 'int', 'shade'),
+  right = TRUE
+)
+
 # average water potentials across years
 trait_data1 <- trait_data1 %>%
   mutate(predawn_MPa_combined = rowMeans(cbind(predawn_MPa_2025, predawn_MPa_2024), na.rm = TRUE))
@@ -218,52 +223,5 @@ PILA <- trait_data1[trait_data1$species == 'PILA',]
 PIPO <- trait_data1[trait_data1$species == 'PIPO',]
 ABMA <- trait_data1[trait_data1$species == 'ABMA',]
 
-# are water potentials and P50s different between years
-# compare trends between years for measured P50 values
-ggplot() +
-  geom_point(data = trait_data1, 
-             aes(x = diameter_complete, y = P50_MPa_2024, color = species, shape = "2024"), 
-             size = 3, alpha = 1) +
-  geom_smooth(data = trait_data1, 
-              aes(x = diameter_complete, y = P50_MPa_2024, color = species, linetype = "2024"), 
-              method = "lm", se = TRUE, alpha = 0.3) +
-  geom_point(data = trait_data1, 
-             aes(x = diameter_complete, y = P50_MPa_2025, color = species, shape = "2025"), 
-             size = 3, alpha = 1) +
-  geom_smooth(data = trait_data1, 
-              aes(x = diameter_complete, y = P50_MPa_2025, color = species, linetype = "2025"), 
-              method = "lm", se = TRUE, alpha = 0.3) +
-  scale_color_manual(values = c(
-    "ABCO" = "mediumturquoise",
-    "PIPO" = "lawngreen",
-    "ABMA" = "maroon3",
-    "PILA" = "lightslateblue"
-  )) +
-  scale_shape_manual(name = "Year", values = c("2024" = 16, "2025" = 17)) +
-  scale_linetype_manual(name = "Year", values = c("2024" = "solid", "2025" = "dashed")) +
-  labs(
-    x = "Basal diameter (cm)",
-    y = "P50 (-MPa)",
-    color = "Species"
-  ) +
-  theme(
-    panel.background = element_blank(),
-    panel.grid.major = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.border = element_blank(),
-    axis.line = element_line(color = "black"),
-    legend.position = "top"
-  )
-
-
-P50_summary_table <- trait_data1 %>%
-  filter(!is.na(P50_MPa_2024) | !is.na(P50_MPa_2025)) %>% 
-  group_by(size, species, elevation, microsite) %>%
-  summarise(n_individuals = n(), .groups = "drop")
-
-WP_summary_table <- trait_data1 %>%
-  filter(!is.na(predawn_MPa_2024) | !is.na(predawn_MPa_2025)) %>% 
-  group_by(size, species, plot) %>%
-  summarise(n_individuals = n(), .groups = "drop")
 
 write.csv(trait_data1, file = "yuba-phys-prepped-field-data-2024_2025.csv", row.names = FALSE)
