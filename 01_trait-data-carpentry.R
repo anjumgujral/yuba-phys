@@ -185,16 +185,12 @@ trait_data1$HSM_midday_2025 <- trait_data1$P50_MPa_2025 - trait_data1$midday_MPa
 trait_data1$HSM_predawn_combined <- trait_data1$P50_combined - trait_data1$predawn_MPa_combined
 trait_data1$HSM_midday_combined <- trait_data1$P50_combined - trait_data1$midday_MPa_combined
 
-# and now calculate HSM using P50 complete (observed and predicted values) and 2024-2025 
-# combined WP data
-# calculate HSM using P50_complete (measured and predicted P50 infilled for missing values)
+# and now calculate HSM using P50 complete (measured and predicted values) and 2024-2025 combined WP data
 trait_data1$HSM_predawn_P50_mean <- trait_data1$P50_complete - trait_data1$predawn_MPa_combined
 trait_data1$HSM_midday_P50_mean <- trait_data1$P50_complete - trait_data1$midday_MPa_combined
 
 # remove outlier tree_ID == 94
 trait_data1 <- trait_data1[trait_data1$tree_ID != 94, ]
-trait_data2 <- trait_data2[trait_data2$tree_ID != 94, ]
-trait_data3 <- trait_data3[trait_data3$tree_ID != 94, ]
 
 # scale predictor variables
 trait_data1$diameter_complete_scaled <- as.numeric(scale(trait_data1$diameter_complete))
@@ -210,7 +206,7 @@ trait_data1$HSM_midday_P50_mean_scaled <- as.numeric(scale(trait_data1$HSM_midda
 
 # we want to include a random/fixed effect for year, so lets make a column for that, including 'both'
 trait_data1 <- trait_data1 %>%
-  mutate(year = case_when(
+  mutate(wp_year = case_when(
     !is.na(predawn_MPa_2024) & is.na(predawn_MPa_2025) ~ "2024",
     is.na(predawn_MPa_2024) & !is.na(predawn_MPa_2025) ~ "2025",
     !is.na(predawn_MPa_2024) & !is.na(predawn_MPa_2025) ~ "both",

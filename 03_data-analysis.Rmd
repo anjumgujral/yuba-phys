@@ -1,5 +1,5 @@
 ---
-title: "07_preliminary-analyses"
+title: "03_data-analysis"
 author: "Anjum K. Gujral"
 date: '2024-11-11'
 output:
@@ -203,7 +203,7 @@ corrplot(cor_matrix,
 
 ```
 
-# wp
+# water potentials
 ```{r}
 # summary of WP and P50 samples sizes
 P50_summary_table <- trait_data1 %>%
@@ -254,12 +254,10 @@ ggplot() +
   )
 
 # There is a statistically significant difference between 2024 and 2025 predawn and midday water potential means. On average, predawn WP is higher (more negative) in 2024 and midday is 
-t.test(predawn_MPa_combined ~ year, data = trait_data1, paired = FALSE)
-
-t.test(predawn_MPa_combined ~ year, 
+t.test(predawn_MPa_combined ~ wp_year, 
        data = trait_data1, 
        paired = FALSE,
-       subset = year %in% c("2024", "2025"))
+       subset = wp_year %in% c("2024", "2025"))
 
 ```
 
