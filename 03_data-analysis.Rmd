@@ -22,6 +22,8 @@ library('ggcorrplot')
 library('corrplot')
 library('ggpubr')
 library('emmeans')
+library('RColorBrewer')
+
 ```
 
 # load data
@@ -34,6 +36,10 @@ PILA <- trait_data1[trait_data1$species == 'PILA',]
 PIPO <- trait_data1[trait_data1$species == 'PIPO',]
 ABMA <- trait_data1[trait_data1$species == 'ABMA',]
 
+species_colors <- setNames(
+  brewer.pal(4, "Dark2"),
+  c("ABCO", "ABMA", "PIPO", "PILA")
+)
 ```
 
 #size distribution
@@ -54,14 +60,12 @@ ggplot(trait_data1, aes(x = diameter_complete, fill = size)) +
 
 # site distributions
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-
-
 ggplot(trait_data1, aes(x = diameter_complete, y = canopy_closure, color = species)) +
   geom_point(size = 3, alpha = 0.7) +
   labs(
        y = "Canopy closure", 
        x = "Basal diameter (cm)") +
-  scale_color_manual(values = c("blue", "green", "red", "purple")) +
+  scale_color_manual(values = species_colors) +
   theme_bw() +
   theme(
     panel.grid.major = element_blank(), 
@@ -177,9 +181,9 @@ ggplot(trait_data1, aes(x = microsite, y = stand_basal_area)) +
 cor_matrix <- cor(trait_data1[, c("canopy_closure", "elevation_ft", "stand_basal_area")], use = "pairwise.complete.obs")
 print(cor_matrix)
 
+# run correlation tests for every possible combination of canopy closure, elevation, and stand basal area
 cor(trait_data1$elevation_ft, trait_data1$stand_basal_area, 
     use = "complete.obs", method = "pearson")
-
 cor.test(trait_data1$stand_basal_area, trait_data1$elevation_ft, method="pearson")
 
 # Create a custom set of axis labels (modify as per your needs)
@@ -199,7 +203,6 @@ corrplot(cor_matrix,
          tl.labels = custom_labels, 
          title = "Correlation Plot"
 )
-
 
 ```
 
@@ -284,16 +287,31 @@ summary(mod2)
 # table S3 models
 ```{r}
 # run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S3
-# run this model with HSM_midday_P50_mean_scaled as a predictor instead of P50_scaled
-
-mod3 <- lmer(internode_length_1_2~ diameter_complete_scaled + predawn_scaled + P50_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = ABCO)
+mod3 <- lmer(internode_length_1_2~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = ABCO)
 summary(mod3)
 
-# Fit linear model of growth on diameter
+# check whether growth~ environment and growth~ trait trends differ when standardizing growth by diameter
+# fit linear model of growth on diameter
 growth_diam_mod <- lm(internode_length_1_2 ~ diameter_complete, data = trait_data1, na.action = na.exclude)
 
 # Extract residuals and add as new column
 trait_data1$growth_residuals <- residuals(growth_diam_mod)
+
+# subset data frame by species with new growth_residuals variable
+ABCO <- trait_data1[trait_data1$species == 'ABCO',]
+PILA <- trait_data1[trait_data1$species == 'PILA',]
+PIPO <- trait_data1[trait_data1$species == 'PIPO',]
+ABMA <- trait_data1[trait_data1$species == 'ABMA',]
+
+# rerun lmer with 'growth_residuals' as response variable for all species
+mod4 <- lmer(growth_residuals~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = ABCO)
+summary(mod4) 
+
+# table 3 statistics are not significantly different using growth_residuals versus internode_length, proceed with internode_length
+
+# now, do results differ substantially by using log internode length?
+mod5 <- lmer(log(internode_length_1_2) ~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = ABCO)
+summary(mod5) 
 
 ggplot(trait_data1, aes(x = log(diameter_complete), y = log(internode_length_1_2), color = species)) +
   geom_point(size = 3, alpha = 1) +  
@@ -313,20 +331,22 @@ ggplot(trait_data1, aes(x = log(diameter_complete), y = log(internode_length_1_2
     legend.position = "none"
   )
 
+# results are not significantly changed by using growth~diameter residuals or by log transforming internode length, so we use mod3 for our table 3 statistics
+
 ```
 
 # table S4-5 models
 ```{r}
 # run this model for the following response variables for table S4
-mod4 <- lmer(predawn_MPa_combined ~ species + diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = trait_data1)
-summary(mod4)
+mod6 <- lmer(predawn_MPa_combined ~ species + diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = trait_data1)
+summary(mod6)
 
 # run this model for the following response variables for table S5
-mod5 <- lmer(predawn_MPa_combined ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|year), data = trait_data1)
-summary(mod5)
+mod7 <- lmer(predawn_MPa_combined ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|year), data = trait_data1)
+summary(mod7)
 
 # table 5 pairwise comparisons using emmeans
-emms1 <- emmeans(mod5, pairwise ~ species)
+emms1 <- emmeans(mod7, pairwise ~ species)
 summary(emms1$emmeans)
 summary(emms1$contrasts) #automatically adjusts to tukey, for multiple comparisons
 
