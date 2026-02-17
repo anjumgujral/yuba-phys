@@ -1905,7 +1905,7 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 
   # Prediction data (other covariates at mean = 0 scaled)
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_e) / sd_e,
+    elevation_ft_scaled = (elev_seq - mean_e) / sd_e,
     diameter_complete_scaled = 0,
     canopy_closure_scaled = 0
   )
@@ -1922,7 +1922,7 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 S1A <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
-    aes(x = elev_indiv, y = predawn_MPa_2024, color = species),
+    aes(x = elevation_ft, y = predawn_MPa_2024, color = species),
     size = 3,
     alpha = 0.35,
     na.rm = TRUE
@@ -1945,8 +1945,8 @@ S1A <- ggplot() +
   )) +
   scale_x_continuous(
     breaks = seq(
-      floor(min(trait_data1$elev_indiv, na.rm = TRUE)),
-      ceiling(max(trait_data1$elev_indiv, na.rm = TRUE)),
+      floor(min(trait_data1$elevation_ft, na.rm = TRUE)),
+      ceiling(max(trait_data1$elevation_ft, na.rm = TRUE)),
       by = 500
     )
   ) +
@@ -1978,13 +1978,13 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   df <- species_list[[sp]]
 
   mod <- lmer(
-    midday_MPa_2024 ~ elev_indiv_scaled + diameter_complete_scaled +
+    midday_MPa_2024 ~ elevation_ft_scaled + diameter_complete_scaled +
       canopy_closure_scaled + (1|plot),
     data = df
   )
 
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
   signif_label <- dplyr::case_when(
     elev_p < 0.05 ~ "Significant",
@@ -1992,15 +1992,15 @@ for (sp in setdiff(names(species_list), "ABMA")) {
     TRUE          ~ "Not significant"
   )
 
-  mean_e <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_e   <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_e <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_e   <- sd(df$elevation_ft, na.rm = TRUE)
 
-  elev_seq <- seq(min(df$elev_indiv, na.rm = TRUE),
-                  max(df$elev_indiv, na.rm = TRUE),
+  elev_seq <- seq(min(df$elevation_ft, na.rm = TRUE),
+                  max(df$elevation_ft, na.rm = TRUE),
                   length.out = 100)
 
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_e) / sd_e,
+    elevation_ft_scaled = (elev_seq - mean_e) / sd_e,
     diameter_complete_scaled = 0,
     canopy_closure_scaled = 0
   )
@@ -2020,7 +2020,7 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 S1B <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
-    aes(x = elev_indiv, y = midday_MPa_2024, color = species),
+    aes(x = elevation_ft, y = midday_MPa_2024, color = species),
     size = 3, alpha = 0.35
   ) +
   scale_color_manual(values = species_colors) +
@@ -2044,8 +2044,8 @@ S1B <- ggplot() +
 )+
   scale_x_continuous(
     breaks = seq(
-      floor(min(trait_data1$elev_indiv, na.rm = TRUE)),
-      ceiling(max(trait_data1$elev_indiv, na.rm = TRUE)),
+      floor(min(trait_data1$elevation_ft, na.rm = TRUE)),
+      ceiling(max(trait_data1$elevation_ft, na.rm = TRUE)),
       by = 500
     )
   ) +
@@ -2068,13 +2068,13 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   df <- species_list[[sp]]
 
   mod <- lmer(
-    predawn_MPa_2025 ~ elev_indiv_scaled + diameter_complete_scaled +
+    predawn_MPa_2025 ~ elevation_ft_scaled + diameter_complete_scaled +
       canopy_closure_scaled + (1 | plot),
     data = df
   )
 
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
   signif_label <- dplyr::case_when(
     elev_p < 0.05 ~ "Significant",
@@ -2087,17 +2087,17 @@ for (sp in setdiff(names(species_list), "ABMA")) {
     data.frame(species = sp, p_value = elev_p, signif = signif_label)
   )
 
-  mean_e <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_e <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_e <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_e <- sd(df$elevation_ft, na.rm = TRUE)
 
   elev_seq <- seq(
-    min(df$elev_indiv, na.rm = TRUE),
-    max(df$elev_indiv, na.rm = TRUE),
+    min(df$elevation_ft, na.rm = TRUE),
+    max(df$elevation_ft, na.rm = TRUE),
     length.out = 100
   )
 
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_e) / sd_e,
+    elevation_ft_scaled = (elev_seq - mean_e) / sd_e,
     diameter_complete_scaled = 0,
     canopy_closure_scaled = 0
   )
@@ -2117,7 +2117,7 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 S1C <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
-    aes(x = elev_indiv, y = predawn_MPa_2025, color = species),
+    aes(x = elevation_ft, y = predawn_MPa_2025, color = species),
     size = 3,
     alpha = 0.35
   ) +
@@ -2143,8 +2143,8 @@ S1C <- ggplot() +
 )+
   scale_x_continuous(
     breaks = seq(
-      floor(min(trait_data1$elev_indiv, na.rm = TRUE)),
-      ceiling(max(trait_data1$elev_indiv, na.rm = TRUE)),
+      floor(min(trait_data1$elevation_ft, na.rm = TRUE)),
+      ceiling(max(trait_data1$elevation_ft, na.rm = TRUE)),
       by = 500
     )
   ) +
@@ -2169,13 +2169,13 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   df <- species_list[[sp]]
 
   mod <- lmer(
-    midday_MPa_2025 ~ elev_indiv_scaled + diameter_complete_scaled +
+    midday_MPa_2025 ~ elevation_ft_scaled + diameter_complete_scaled +
       canopy_closure_scaled + (1 | plot),
     data = df
   )
 
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
   signif_label <- dplyr::case_when(
     elev_p < 0.05 ~ "Significant",
@@ -2188,17 +2188,17 @@ for (sp in setdiff(names(species_list), "ABMA")) {
     data.frame(species = sp, p_value = elev_p, signif = signif_label)
   )
 
-  mean_e <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_e <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_e <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_e <- sd(df$elevation_ft, na.rm = TRUE)
 
   elev_seq <- seq(
-    min(df$elev_indiv, na.rm = TRUE),
-    max(df$elev_indiv, na.rm = TRUE),
+    min(df$elevation_ft, na.rm = TRUE),
+    max(df$elevation_ft, na.rm = TRUE),
     length.out = 100
   )
 
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_e) / sd_e,
+    elevation_ft_scaled = (elev_seq - mean_e) / sd_e,
     diameter_complete_scaled = 0,
     canopy_closure_scaled = 0
   )
@@ -2218,7 +2218,7 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 S1D <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
-    aes(x = elev_indiv, y = midday_MPa_2025, color = species),
+    aes(x = elevation_ft, y = midday_MPa_2025, color = species),
     size = 3,
     alpha = 0.35
   ) +
@@ -2243,8 +2243,8 @@ S1D <- ggplot() +
 ) + 
   scale_x_continuous(
     breaks = seq(
-      floor(min(trait_data1$elev_indiv, na.rm = TRUE)),
-      ceiling(max(trait_data1$elev_indiv, na.rm = TRUE)),
+      floor(min(trait_data1$elevation_ft, na.rm = TRUE)),
+      ceiling(max(trait_data1$elevation_ft, na.rm = TRUE)),
       by = 500
     )
   ) +
@@ -2269,13 +2269,13 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   df <- species_list[[sp]]
 
   mod <- lmer(
-    predawn_MPa_combined ~ elev_indiv_scaled + diameter_complete_scaled +
-      canopy_closure_scaled + (1 | plot) + (1 | year),
+    predawn_MPa_combined ~ elevation_ft_scaled + diameter_complete_scaled +
+      canopy_closure_scaled + (1 | plot) + (1 |wp_year),
     data = df
   )
 
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
   signif_label <- dplyr::case_when(
     elev_p < 0.05 ~ "Significant",
@@ -2288,17 +2288,17 @@ for (sp in setdiff(names(species_list), "ABMA")) {
     data.frame(species = sp, p_value = elev_p, signif = signif_label)
   )
 
-  mean_e <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_e <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_e <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_e <- sd(df$elevation_ft, na.rm = TRUE)
 
   elev_seq <- seq(
-    min(df$elev_indiv, na.rm = TRUE),
-    max(df$elev_indiv, na.rm = TRUE),
+    min(df$elevation_ft, na.rm = TRUE),
+    max(df$elevation_ft, na.rm = TRUE),
     length.out = 100
   )
 
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_e) / sd_e,
+    elevation_ft_scaled = (elev_seq - mean_e) / sd_e,
     diameter_complete_scaled = 0,
     canopy_closure_scaled = 0
   )
@@ -2318,7 +2318,7 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 S1E <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
-    aes(x = elev_indiv, y = predawn_MPa_combined, color = species),
+    aes(x = elevation_ft, y = predawn_MPa_combined, color = species),
     size = 3,
     alpha = 0.35
   ) +
@@ -2343,8 +2343,8 @@ S1E <- ggplot() +
 ) + 
   scale_x_continuous(
     breaks = seq(
-      floor(min(trait_data1$elev_indiv, na.rm = TRUE)),
-      ceiling(max(trait_data1$elev_indiv, na.rm = TRUE)),
+      floor(min(trait_data1$elevation_ft, na.rm = TRUE)),
+      ceiling(max(trait_data1$elevation_ft, na.rm = TRUE)),
       by = 500
     )
   ) +
@@ -2369,13 +2369,13 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   df <- species_list[[sp]]
 
   mod <- lmer(
-    midday_MPa_combined ~ elev_indiv_scaled + diameter_complete_scaled +
-      canopy_closure_scaled + (1 | plot) + (1 | year),
+    midday_MPa_combined ~ elevation_ft_scaled + diameter_complete_scaled +
+      canopy_closure_scaled + (1 | plot) + (1 |wp_year),
     data = df
   )
 
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
   signif_label <- dplyr::case_when(
     elev_p < 0.05 ~ "Significant",
@@ -2388,17 +2388,17 @@ for (sp in setdiff(names(species_list), "ABMA")) {
     data.frame(species = sp, p_value = elev_p, signif = signif_label)
   )
 
-  mean_e <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_e <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_e <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_e <- sd(df$elevation_ft, na.rm = TRUE)
 
   elev_seq <- seq(
-    min(df$elev_indiv, na.rm = TRUE),
-    max(df$elev_indiv, na.rm = TRUE),
+    min(df$elevation_ft, na.rm = TRUE),
+    max(df$elevation_ft, na.rm = TRUE),
     length.out = 100
   )
 
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_e) / sd_e,
+    elevation_ft_scaled = (elev_seq - mean_e) / sd_e,
     diameter_complete_scaled = 0,
     canopy_closure_scaled = 0
   )
@@ -2418,7 +2418,7 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 S1F <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
-    aes(x = elev_indiv, y = midday_MPa_combined, color = species),
+    aes(x = elevation_ft, y = midday_MPa_combined, color = species),
     size = 3,
     alpha = 0.35
   ) +
@@ -2444,8 +2444,8 @@ S1F <- ggplot() +
 ) + 
   scale_x_continuous(
     breaks = seq(
-      floor(min(trait_data1$elev_indiv, na.rm = TRUE)),
-      ceiling(max(trait_data1$elev_indiv, na.rm = TRUE)),
+      floor(min(trait_data1$elevation_ft, na.rm = TRUE)),
+      ceiling(max(trait_data1$elevation_ft, na.rm = TRUE)),
       by = 500
     )
   ) +
