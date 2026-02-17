@@ -15,9 +15,9 @@ library(gridExtra)
 
 # load data
 ```{r}
-trait_data1<- read.csv("/Users/anjumgujral/Box Sync/yuba-phys_data/traits/yuba-phys-prepped-field-data-2024_2025.csv")
+trait_data1<- read.csv("yuba-phys-prepped-field-data-2024_2025.csv")
 
-# subset dataframe by species 
+# subset data frame by species 
 ABCO <- trait_data1[trait_data1$species == 'ABCO',]
 PILA <- trait_data1[trait_data1$species == 'PILA',]
 PIPO <- trait_data1[trait_data1$species == 'PIPO',]
@@ -49,7 +49,7 @@ species_list_elev <- list(
 )
 ```
 
-# Figure 1 - WP
+# Figure 1 - WP x diameter
 ```{r}
 ### FIGURE 1A: Predawn by size
 ## plotting model fit
@@ -62,9 +62,9 @@ for (sp in names(species_list)) {
 
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for diameter
@@ -166,9 +166,9 @@ for (sp in names(species_list)) {
 
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for diameter
@@ -205,7 +205,7 @@ signif_label <- dplyr::case_when(
     newdata <- data.frame(
       diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
@@ -270,6 +270,7 @@ grid.arrange(Fig1A, Fig1B, ncol = 2)
 ```
 
 # Figure 2- P50
+## diameter
 ```{r}
 
 ### FIGURE 2A: P50 by size
@@ -283,9 +284,9 @@ for (sp in names(species_list)) {
 
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(P50_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(P50_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(P50_combined ~ diameter_complete_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(P50_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for diameter
@@ -320,7 +321,7 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
@@ -372,7 +373,10 @@ scale_alpha_manual(values = c(
     legend.position = "none"
   )
 Fig2A
+```
 
+## predawn
+```{r}
 ### FIGURE 2B: P50 by predawn 
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -383,10 +387,10 @@ for (sp in names(species_list)) {
   # Fit species-specific model
   if (sp == "ABMA") {
     mod <- lmer(P50_combined ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  (1|plot) + (1|year), data = df)
+                  (1|plot) + (1|wp_year), data = df)
   } else {
     mod <- lmer(P50_combined ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  elev_indiv_scaled + (1|plot) + (1|year), data = df)
+                  elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for predawn
@@ -424,7 +428,7 @@ for (sp in names(species_list)) {
       predawn_scaled = (pd_seq - mean_pd)/sd_pd,
       diameter_complete_scaled = 0,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
@@ -475,8 +479,11 @@ scale_alpha_manual(values = c(
   )
 
 Fig2B
+```
 
-### FIGURE 2C: P50_combined by percent cover
+## canopy closure
+```{r}
+### FIGURE 2C: P50_combined by canopy closure 
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -486,10 +493,10 @@ for (sp in names(species_list)) {
   # Fit species-specific model
   if (sp == "ABMA") {
     mod <- lmer(P50_combined ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  (1|plot) + (1|year), data = df)
+                  (1|plot) + (1|wp_year), data = df)
   } else {
     mod <- lmer(P50_combined ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  elev_indiv_scaled + (1|plot) + (1|year), data = df)
+                  elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for canopy closure
@@ -507,12 +514,12 @@ for (sp in names(species_list)) {
                                                  signif = signif_label))
 
   # Compute mean and SD for scaling percent cover
-  mean_cc <- mean(df$percent_cover, na.rm = TRUE)
-  sd_cc   <- sd(df$percent_cover, na.rm = TRUE)
+  mean_cc <- mean(df$canopy_closure, na.rm = TRUE)
+  sd_cc   <- sd(df$canopy_closure, na.rm = TRUE)
 
   # Sequence of percent cover values
-  cc_seq <- seq(min(df$percent_cover, na.rm = TRUE),
-                max(df$percent_cover, na.rm = TRUE),
+  cc_seq <- seq(min(df$canopy_closure, na.rm = TRUE),
+                max(df$canopy_closure, na.rm = TRUE),
                 length.out = 100)
 
   # Prediction data
@@ -527,11 +534,11 @@ for (sp in names(species_list)) {
       canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
       diameter_complete_scaled = 0,
       predawn_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
-  newdata$percent_cover <- cc_seq
+  newdata$canopy_closure <- cc_seq
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif <- signif_label
@@ -542,10 +549,10 @@ for (sp in names(species_list)) {
 ### Plot
 Fig2C <- ggplot() +
   geom_point(data = trait_data1,
-             aes(x = percent_cover, y = P50_combined, color = species),
+             aes(x = canopy_closure, y = P50_combined, color = species),
              alpha = 0.35, size = 2.5, na.rm = TRUE) +
   geom_line(data = all_preds,
-            aes(x = percent_cover, y = pred, color = species, linetype = signif),
+            aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
@@ -574,7 +581,10 @@ scale_alpha_manual(values = c(
     legend.position = "none"
   )
 Fig2C
+```
 
+## elevation
+```{r}
 # ---- FIGURE 2D: P50_combined by elevation ----
 all_preds_elev_P50 <- data.frame()
 model_summaries_elev_P50 <- data.frame()
@@ -583,11 +593,11 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   # Fit model
-  mod <- lmer(P50_combined ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+  mod <- lmer(P50_combined ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
 
   # Extract fixed-effect p-value for elevation
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
   signif_label <- dplyr::case_when(
   elev_p < 0.05 ~ "Significant",
   elev_p < 0.1  ~ "Marginal",
@@ -600,17 +610,17 @@ for (sp in names(species_list_elev)) {
                                                  signif = signif_label))
 
   # Compute mean and SD for scaling elevation
-  mean_elev <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_elev   <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_elev <- mean(df$elevation_ft_scaled, na.rm = TRUE)
+  sd_elev   <- sd(df$elevation_ft_scaled, na.rm = TRUE)
 
   # Sequence of elevations
-  elev_seq <- seq(min(df$elev_indiv, na.rm = TRUE),
-                  max(df$elev_indiv, na.rm = TRUE),
+  elev_seq <- seq(min(df$elevation_ft_scaled, na.rm = TRUE),
+                  max(df$elevation_ft_scaled, na.rm = TRUE),
                   length.out = 100)
 
   # Prediction data
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_elev)/sd_elev,
+    elevation_ft_scaled = (elev_seq - mean_elev)/sd_elev,
     diameter_complete_scaled = 0,
     predawn_scaled = 0,
     canopy_closure_scaled = 0
@@ -626,7 +636,7 @@ for (sp in names(species_list_elev)) {
 
 Fig2D <- ggplot() +
   geom_point(data = trait_data1 %>% filter(species %in% names(species_list_elev)),
-             aes(x = elev_indiv, y = P50_combined, color = species),
+             aes(x = elevation_ft, y = P50_combined, color = species),
              alpha = 0.35, size = 2.5, na.rm = TRUE) +
   geom_line(data = all_preds_elev_P50,
             aes(x = elevation, y = pred, color = species, linetype = signif),
@@ -657,6 +667,7 @@ grid.arrange(Fig2A, Fig2B, Fig2C, Fig2D, ncol=2, nrow=2)
 ```
 
 #Figure 3 - HSM
+## diameter
 ```{r}
 
 ### FIGURE 3A: HSM_predawn_P50_mean
@@ -669,9 +680,9 @@ for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
   if (sp == "ABMA") {
-    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   summ <- summary(mod)$coefficients
@@ -702,7 +713,7 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
@@ -743,6 +754,7 @@ Fig3A <- ggplot() +
     legend.position = "none"
   )
 Fig3A
+
 ### FIGURE 3B: HSM_midday_P50_mean
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -751,9 +763,9 @@ for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
   if (sp == "ABMA") {
-    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   summ <- summary(mod)$coefficients
@@ -785,7 +797,7 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
@@ -835,8 +847,11 @@ Fig3A <- Fig3A + coord_cartesian(ylim = c(ymin, ymax))
 Fig3B <- Fig3B + coord_cartesian(ylim = c(ymin, ymax))
 
 grid.arrange(Fig3A, Fig3B, nrow=1, ncol = 2)
+```
 
-### FIGURE 3C: HSM_predawn_P50 by percent cover
+## canopy closure
+```{r}
+### FIGURE 3C: HSM_predawn_P50 by canopy closure
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -846,10 +861,10 @@ for (sp in names(species_list)) {
   # Fit species-specific model
   if (sp == "ABMA") {
     mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  (1|plot) + (1|year), data = df)
+                  (1|plot) + (1|wp_year), data = df)
   } else {
     mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  elev_indiv_scaled + (1|plot) + (1|year), data = df)
+                  elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for canopy closure
@@ -867,12 +882,12 @@ for (sp in names(species_list)) {
                                                  signif = signif_label))
 
   # Compute mean and SD for scaling percent cover
-  mean_cc <- mean(df$percent_cover, na.rm = TRUE)
-  sd_cc   <- sd(df$percent_cover, na.rm = TRUE)
+  mean_cc <- mean(df$canopy_closure, na.rm = TRUE)
+  sd_cc   <- sd(df$canopy_closure, na.rm = TRUE)
 
   # Sequence of percent cover values
-  cc_seq <- seq(min(df$percent_cover, na.rm = TRUE),
-                max(df$percent_cover, na.rm = TRUE),
+  cc_seq <- seq(min(df$canopy_closure, na.rm = TRUE),
+                max(df$canopy_closure, na.rm = TRUE),
                 length.out = 100)
 
   # Prediction data
@@ -887,11 +902,11 @@ for (sp in names(species_list)) {
       canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
       diameter_complete_scaled = 0,
       predawn_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
-  newdata$percent_cover <- cc_seq
+  newdata$canopy_closure <- cc_seq
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif <- signif_label
@@ -902,10 +917,10 @@ for (sp in names(species_list)) {
 ### Plot
 Fig3C <- ggplot() +
   geom_point(data = trait_data1,
-             aes(x = percent_cover, y = HSM_predawn_P50_mean, color = species),
+             aes(x = canopy_closure, y = HSM_predawn_P50_mean, color = species),
              alpha = 0.35, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
-            aes(x = percent_cover, y = pred, color = species, linetype = signif),
+            aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
     scale_linetype_manual(values = c(
@@ -930,7 +945,7 @@ Fig3C <- ggplot() +
   )
 Fig3C
 
-### FIGURE 3D: HSM_midday_P50 by percent cover
+### FIGURE 3D: HSM_midday_P50 by canopy closure
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -940,10 +955,10 @@ for (sp in names(species_list)) {
   # Fit species-specific model
   if (sp == "ABMA") {
     mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  (1|plot) + (1|year), data = df)
+                  (1|plot) + (1|wp_year), data = df)
   } else {
     mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
-                  elev_indiv_scaled + (1|plot) + (1|year), data = df)
+                  elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for canopy closure
@@ -961,12 +976,12 @@ for (sp in names(species_list)) {
                                                  signif = signif_label))
 
   # Compute mean and SD for scaling percent cover
-  mean_cc <- mean(df$percent_cover, na.rm = TRUE)
-  sd_cc   <- sd(df$percent_cover, na.rm = TRUE)
+  mean_cc <- mean(df$canopy_closure, na.rm = TRUE)
+  sd_cc   <- sd(df$canopy_closure, na.rm = TRUE)
 
   # Sequence of percent cover values
-  cc_seq <- seq(min(df$percent_cover, na.rm = TRUE),
-                max(df$percent_cover, na.rm = TRUE),
+  cc_seq <- seq(min(df$canopy_closure, na.rm = TRUE),
+                max(df$canopy_closure, na.rm = TRUE),
                 length.out = 100)
 
   # Prediction data
@@ -981,11 +996,11 @@ for (sp in names(species_list)) {
       canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
       diameter_complete_scaled = 0,
       predawn_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
-  newdata$percent_cover <- cc_seq
+  newdata$canopy_closure <- cc_seq
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif <- signif_label
@@ -996,10 +1011,10 @@ for (sp in names(species_list)) {
 ### Plot
 Fig3D <- ggplot() +
   geom_point(data = trait_data1,
-             aes(x = percent_cover, y = HSM_midday_P50_mean, color = species),
+             aes(x = canopy_closure, y = HSM_midday_P50_mean, color = species),
              alpha = 0.35, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
-            aes(x = percent_cover, y = pred, color = species, linetype = signif),
+            aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
    scale_linetype_manual(values = c(
@@ -1023,7 +1038,10 @@ Fig3D <- ggplot() +
     legend.position = "none"
   )
 Fig3D
+```
 
+##elevation
+```{r}
 # ---- FIGURE 3E: HSM_predawn_P50_mean by elevation ----
 all_preds_elev_HSM <- data.frame()
 model_summaries_elev_HSM <- data.frame()
@@ -1032,11 +1050,11 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   # Fit model
-  mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+  mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
 
   # Extract fixed-effect p-value for elevation
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
   signif_label <- dplyr::case_when(
   elev_p < 0.05 ~ "Significant",
   elev_p < 0.1  ~ "Marginal",
@@ -1049,17 +1067,17 @@ for (sp in names(species_list_elev)) {
                                                  signif = signif_label))
 
   # Compute mean and SD for scaling elevation
-  mean_elev <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_elev   <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_elev <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_elev   <- sd(df$elevation_ft, na.rm = TRUE)
 
   # Sequence of elevations
-  elev_seq <- seq(min(df$elev_indiv, na.rm = TRUE),
-                  max(df$elev_indiv, na.rm = TRUE),
+  elev_seq <- seq(min(df$elevation_ft, na.rm = TRUE),
+                  max(df$elevation_ft, na.rm = TRUE),
                   length.out = 100)
 
   # Prediction data
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_elev)/sd_elev,
+    elevation_ft_scaled = (elev_seq - mean_elev)/sd_elev,
     diameter_complete_scaled = 0,
     predawn_scaled = 0,
     canopy_closure_scaled = 0
@@ -1076,7 +1094,7 @@ for (sp in names(species_list_elev)) {
 # Plot Figure 3E
 Fig3E <- ggplot() +
   geom_point(data = trait_data1 %>% dplyr::filter(species %in% names(species_list_elev)),
-             aes(x = elev_indiv, y = HSM_predawn_P50_mean, color = species),
+             aes(x = elevation_ft, y = HSM_predawn_P50_mean, color = species),
              alpha = 0.35, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_elev_HSM,
             aes(x = elevation, y = pred, color = species, linetype = signif),
@@ -1112,11 +1130,11 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   # Fit model
-  mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+  mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
 
   # Extract fixed-effect p-value for elevation
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
   signif_label <- dplyr::case_when(
   elev_p < 0.05 ~ "Significant",
   elev_p < 0.1  ~ "Marginal",
@@ -1129,17 +1147,17 @@ for (sp in names(species_list_elev)) {
                                                  signif = signif_label))
 
   # Compute mean and SD for scaling elevation
-  mean_elev <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_elev   <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_elev <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_elev   <- sd(df$elevation_ft, na.rm = TRUE)
 
   # Sequence of elevations
-  elev_seq <- seq(min(df$elev_indiv, na.rm = TRUE),
-                  max(df$elev_indiv, na.rm = TRUE),
+  elev_seq <- seq(min(df$elevation_ft, na.rm = TRUE),
+                  max(df$elevation_ft, na.rm = TRUE),
                   length.out = 100)
 
   # Prediction data
   newdata <- data.frame(
-    elev_indiv_scaled = (elev_seq - mean_elev)/sd_elev,
+    elevation_ft_scaled = (elev_seq - mean_elev)/sd_elev,
     diameter_complete_scaled = 0,
     predawn_scaled = 0,
     canopy_closure_scaled = 0
@@ -1156,7 +1174,7 @@ for (sp in names(species_list_elev)) {
 # Plot Figure 3F
 Fig3F <- ggplot() +
   geom_point(data = trait_data1 %>% dplyr::filter(species %in% names(species_list_elev)),
-             aes(x = elev_indiv, y = HSM_midday_P50_mean, color = species),
+             aes(x = elevation_ft, y = HSM_midday_P50_mean, color = species),
              alpha = 0.35, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_elev_HSM,
             aes(x = elevation, y = pred, color = species, linetype = signif),
@@ -1183,7 +1201,10 @@ Fig3F <- ggplot() +
     legend.position = "none"
   )
 Fig3F
+```
 
+## predawn
+```{r}
 ### FIGURE 3G: HSM by predawn 
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -1193,9 +1214,9 @@ for (sp in names(species_list)) {
 
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot) + (1|year), data = df)
+    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
   # Extract fixed-effect p-value for predawn
@@ -1229,7 +1250,7 @@ for (sp in names(species_list)) {
       predawn_scaled = (pd_seq - mean_pd)/sd_pd,
       diameter_complete_scaled = 0,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
 
@@ -1283,6 +1304,7 @@ grid.arrange(Fig3A, Fig3B, Fig3C, Fig3D, Fig3E, Fig3F, blank_plot, Fig3G, ncol =
 
 
 # Figure 4 - growth 
+## diameter
 ```{r}
 ### Figure 4A: Internode length by diameter, holding predawn, canopy closure, and elevation constant
 
@@ -1301,7 +1323,7 @@ for (sp in names(species_list)) {
                 data = df)
   } else {
     mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled +
-                  canopy_closure_scaled + elev_indiv_scaled + (1|plot),
+                  canopy_closure_scaled + elevation_ft_scaled + (1|plot),
                 data = df)
   }
   
@@ -1337,7 +1359,7 @@ for (sp in names(species_list)) {
       diameter_complete_scaled = (diam_seq - mean_diam) / sd_diam,
       predawn_scaled = 0,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
   
@@ -1380,7 +1402,10 @@ Fig4A <- ggplot() +
     legend.position = "none"
   )
 Fig4A
+```
 
+## predawn
+```{r}
 ### FIGURE 4B: Internode length by predawn water potential
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -1393,7 +1418,7 @@ for (sp in names(species_list)) {
     mod <- lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled + diameter_complete_scaled +
                   (1|plot), data = df)
   } else {
-    mod <- lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled + elev_indiv_scaled + diameter_complete_scaled +
+    mod <- lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + diameter_complete_scaled +
                   (1|plot), data = df)
   }
 
@@ -1422,7 +1447,7 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       predawn_scaled = (pd_seq - mean_pd)/sd_pd,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0,
+      elevation_ft_scaled = 0,
       diameter_complete_scaled = 0
     )
   }
@@ -1468,7 +1493,10 @@ Fig4B <- ggplot() +
     legend.position = "none"
   )
 Fig4B
+```
 
+## HSM
+```{r}
 ### FIGURE 4C: Internode length by HSM_midday_P50_mean
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -1481,7 +1509,7 @@ for (sp in names(species_list)) {
     mod <- lmer(internode_length_1_2 ~ HSM_midday_P50_mean_scaled + predawn_scaled + canopy_closure_scaled + diameter_complete_scaled +
                   (1|plot), data = df)
   } else {
-    mod <- lmer(internode_length_1_2 ~ HSM_midday_P50_mean_scaled + predawn_scaled + canopy_closure_scaled + elev_indiv_scaled + diameter_complete_scaled +
+    mod <- lmer(internode_length_1_2 ~ HSM_midday_P50_mean_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + diameter_complete_scaled +
                   (1|plot), data = df)
   }
 
@@ -1513,7 +1541,7 @@ for (sp in names(species_list)) {
       HSM_midday_P50_mean_scaled = (hsm_seq - mean_hsm)/sd_hsm,
       predawn_scaled = 0,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0,
+      elevation_ft_scaled = 0,
       diameter_complete_scaled = 0
     )
   }
@@ -1556,6 +1584,10 @@ Fig4C <- ggplot() +
     legend.position = "none"
   )
 Fig4C
+```
+
+##P50
+```{r}
 # Figure 4D
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -1568,7 +1600,7 @@ for (sp in names(species_list)) {
     mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + P50_scaled + predawn_scaled + canopy_closure_scaled +
                   (1|plot), data = df)
   } else {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + P50_scaled + predawn_scaled + canopy_closure_scaled + elev_indiv_scaled +
+    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + P50_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled +
                   (1|plot), data = df)
   }
 
@@ -1603,7 +1635,7 @@ for (sp in names(species_list)) {
       diameter_complete_scaled = 0,
       predawn_scaled = 0,
       canopy_closure_scaled = 0,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
   newdata$P50_raw <- P50_seq
@@ -1646,8 +1678,10 @@ Fig4D <- ggplot() +
     legend.position = "none"
   )
 Fig4D
+```
 
-### FIGURE 4E: Internode length by canopy closure with predawn as covariate
+```{r}
+### FIGURE 4E: Internode length by canopy closure 
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1658,7 +1692,7 @@ for (sp in names(species_list)) {
   if (sp == "ABMA") {
     mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + predawn_scaled + (1|plot), data = df)
   } else {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + predawn_scaled + elev_indiv_scaled + (1|plot), data = df)
+    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + predawn_scaled + elevation_ft_scaled + (1|plot), data = df)
   }
   
   # Extract fixed-effect p-value for canopy closure
@@ -1676,12 +1710,12 @@ for (sp in names(species_list)) {
                                                  signif = signif_label))
   
   # Compute mean and SD for scaling canopy closure
-  mean_canopy <- mean(df$percent_cover, na.rm = TRUE)
-  sd_canopy   <- sd(df$percent_cover, na.rm = TRUE)
+  mean_canopy <- mean(df$canopy_closure, na.rm = TRUE)
+  sd_canopy   <- sd(df$canopy_closure, na.rm = TRUE)
   
   # Sequence of canopy closure values
-  canopy_seq <- seq(min(df$percent_cover, na.rm = TRUE),
-                    max(df$percent_cover, na.rm = TRUE),
+  canopy_seq <- seq(min(df$canopy_closure, na.rm = TRUE),
+                    max(df$canopy_closure, na.rm = TRUE),
                     length.out = 100)
   
   # Prediction data
@@ -1696,7 +1730,7 @@ for (sp in names(species_list)) {
       diameter_complete_scaled = 0,
       predawn_scaled = 0,
       canopy_closure_scaled = (canopy_seq - mean_canopy)/sd_canopy,
-      elev_indiv_scaled = 0
+      elevation_ft_scaled = 0
     )
   }
   
@@ -1707,11 +1741,13 @@ for (sp in names(species_list)) {
   
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
+```
 
+```{r}
 ### FIGURE 4E: Internode length by canopy closure
 Fig4E <- ggplot() +
   geom_point(data = bind_rows(species_list),
-             aes(x = percent_cover, y = internode_length_1_2, color = species),
+             aes(x = canopy_closure, y = internode_length_1_2, color = species),
              alpha = 0.25, size = 2.5, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = canopy, y = pred, color = species, linetype = signif),
@@ -1738,6 +1774,11 @@ Fig4E <- ggplot() +
     legend.position = "none"
   )
 Fig4E
+
+```
+
+## elevation
+```{r}
 ### FIGURE 4F: Internode length by elevation
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -1746,11 +1787,11 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   # Fit species-specific model
-  mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elev_indiv_scaled + (1|plot), data = df)
+  mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df)
 
   # Extract fixed-effect p-value for elevation
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
   signif_label <- dplyr::case_when(
   elev_p < 0.05 ~ "Significant",
   elev_p < 0.1  ~ "Marginal",
@@ -1763,15 +1804,15 @@ for (sp in names(species_list_elev)) {
                                                  signif = signif_label))
 
   # Sequence of elevation values
-  elev_seq <- seq(min(df$elev_indiv, na.rm = TRUE),
-                  max(df$elev_indiv, na.rm = TRUE),
+  elev_seq <- seq(min(df$elevation_ft, na.rm = TRUE),
+                  max(df$elevation_ft, na.rm = TRUE),
                   length.out = 100)
   # Prediction data
   newdata <- data.frame(
     diameter_complete_scaled = 0,
     predawn_scaled = 0,
     canopy_closure_scaled = 0,
-    elev_indiv_scaled = (elev_seq - mean(df$elev_indiv, na.rm = TRUE))/sd(df$elev_indiv, na.rm = TRUE)
+    elevation_ft_scaled = (elev_seq - mean(df$elevation_ft, na.rm = TRUE))/sd(df$elevation_ft, na.rm = TRUE)
   )
 
   newdata$elev <- elev_seq
@@ -1785,7 +1826,7 @@ for (sp in names(species_list_elev)) {
 ### FIGURE 4F plot
 Fig4F <- ggplot() +
   geom_point(data = bind_rows(species_list_elev),
-             aes(x = elev_indiv, y = internode_length_1_2, color = species),
+             aes(x = elevation_ft, y = internode_length_1_2, color = species),
              alpha = 0.25, size = 2.5, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = elev, y = pred, color = species, linetype = signif),
@@ -1831,14 +1872,14 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 
   # Fit species-specific model (same structure, elevation is focal)
   mod <- lmer(
-    predawn_MPa_2024 ~ elev_indiv_scaled + diameter_complete_scaled +
+    predawn_MPa_2024 ~ elevation_ft_scaled + diameter_complete_scaled +
       canopy_closure_scaled + (1|plot),
     data = df
   )
 
   # Extract p-value for elevation
   summ <- summary(mod)$coefficients
-  elev_p <- summ["elev_indiv_scaled", "Pr(>|t|)"]
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
   signif_label <- dplyr::case_when(
     elev_p < 0.05 ~ "Significant",
@@ -1854,12 +1895,12 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   )
 
   # Compute mean & SD for elevation (unscaled)
-  mean_e <- mean(df$elev_indiv, na.rm = TRUE)
-  sd_e   <- sd(df$elev_indiv, na.rm = TRUE)
+  mean_e <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_e   <- sd(df$elevation_ft, na.rm = TRUE)
 
   # Elevation sequence
-  elev_seq <- seq(min(df$elev_indiv, na.rm = TRUE),
-                  max(df$elev_indiv, na.rm = TRUE),
+  elev_seq <- seq(min(df$elevation_ft, na.rm = TRUE),
+                  max(df$elevation_ft, na.rm = TRUE),
                   length.out = 100)
 
   # Prediction data (other covariates at mean = 0 scaled)
