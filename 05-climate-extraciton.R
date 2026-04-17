@@ -16,11 +16,275 @@ install.packages("prettymapr")
 library(prettymapr)
 install.packages("rnaturalearth")
 install.packages("rnaturalearthdata")
+install.packages('maps')
+library(maps)
 
-
+california <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
+california <- california[california$ID == "california", ]
 calbound = AOI::aoi_get(state = "CA")
 small_box <- aoi_ext(xy = c(-121.2, 38.5, -119.3, 40.0))
-options(climateR.future = FALSE)
+
+# load in exact population locations 
+site_boundaries <- data.frame(
+  id = c("1","2","3", "4", "5", "7", "8", "9", "10", "11"),
+  lon = c(-121.051720, -121.046958, -121.006063, -121.000819, -121.004718, -120.829953, -120.780825, -120.786236, -120.778930, -120.826322),
+  lat = c(39.491387, 39.490947, 39.487019, 39.478789, 39.472552, 39.511469, 39.504699, 39.507502, 39.507644, 39.513851)
+)
+
+sites <- vect(site_boundaries, geom = c("lon", "lat"), crs = "EPSG:4326")
+sites_projection <- project(sites, "EPSG:32610")
+buffer <- buffer(sites_projection, width = 304.8)
+buffer_projection <- project(buffer, "EPSG:4326")
+
+# download 30 year climate normals for ppt
+ppt_1993 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1993.nc")
+ppt_1994 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1994.nc")
+ppt_1995 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1995.nc")
+ppt_1996 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1996.nc")
+ppt_1997 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1997.nc")
+ppt_1998 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1998.nc")
+ppt_1999 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1999.nc")
+ppt_2000 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2000.nc")
+ppt_2001 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2001.nc")
+ppt_2002 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2002.nc")
+ppt_2003 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2003.nc")
+ppt_2004 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2004.nc")
+ppt_2005 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2005.nc")
+ppt_2006 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2006.nc")
+ppt_2007 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2007.nc")
+ppt_2008 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2008.nc")
+ppt_2009 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2009.nc")
+ppt_2010 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2010.nc")
+ppt_2011 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2011.nc")
+ppt_2012 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2012.nc")
+ppt_2013 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2013.nc")
+ppt_2014 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2014.nc")
+ppt_2015 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2015.nc")
+ppt_2016 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2016.nc")
+ppt_2017 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2017.nc")
+ppt_2018 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2018.nc")
+ppt_2019 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2019.nc")
+ppt_2020 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2020.nc")
+ppt_2021 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2021.nc")
+ppt_2022 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2022.nc")
+ppt_2023 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc")
+
+
+ppt_stack <- c(
+  ppt_1994, ppt_1995, ppt_1996, ppt_1997,
+  ppt_1998, ppt_1999, ppt_2000, ppt_2001, ppt_2002,
+  ppt_2003, ppt_2004, ppt_2005, ppt_2006, ppt_2007,
+  ppt_2008, ppt_2009, ppt_2010, ppt_2011, ppt_2012,
+  ppt_2013, ppt_2014, ppt_2015, ppt_2016, ppt_2017,
+  ppt_2018, ppt_2019, ppt_2020, ppt_2021, ppt_2022,
+  ppt_2023
+)
+
+ppt_norm_monthly <- tapp(
+  ppt_stack,
+  index = rep(1:12, times = 30), 
+  fun = mean,
+  na.rm = TRUE
+)
+
+# mean annual precip
+ppt_norm_annual <- sum(ppt_norm_monthly)
+
+# --- PPT NORMAL EXTRACTION ---
+
+# project buffers to match raster CRS
+ppt_buffer <- project(buffer, crs(ppt_norm_annual))
+
+# extract mean annual ppt (already annual)
+ppt_vals <- extract(ppt_norm_annual, ppt_buffer, fun = mean, na.rm = TRUE)
+
+# combine with site data
+ppt_df <- cbind(site_boundaries, ppt_vals)
+
+# rename extracted column
+names(ppt_df)[ncol(ppt_df)] <- "ppt_annual"
+
+# convert to sf
+ppt_sf <- st_as_sf(ppt_df, coords = c("lon","lat"), crs = 4326)
+
+# --- PLOT ---
+
+ppt_map <- ggplot() +
+  geom_sf(data = california, fill = "gray95", color = "white") +
+  geom_sf(data = ppt_sf, aes(color = ppt_annual), size = 3) +
+  scale_color_viridis_c() +
+  coord_sf(xlim = c(-121.3, -120.6), ylim = c(39.3, 39.6)) +
+  theme_minimal() +
+  labs(color = "Annual PPT 30-year Normals (1994-2023) (mm)")
+
+ppt_map
+
+# download 30 year normals for water deficit 
+def_1994 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_1994.nc")
+def_1995 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_1995.nc")
+def_1996 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_1996.nc")
+def_1997 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_1997.nc")
+def_1998 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_1998.nc")
+def_1999 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_1999.nc")
+def_2000 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2000.nc")
+def_2001 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2001.nc")
+def_2002 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2002.nc")
+def_2003 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2003.nc")
+def_2004 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2004.nc")
+def_2005 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2005.nc")
+def_2006 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2006.nc")
+def_2007 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2007.nc")
+def_2008 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2008.nc")
+def_2009 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2009.nc")
+def_2010 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2010.nc")
+def_2011 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2011.nc")
+def_2012 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2012.nc")
+def_2013 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2013.nc")
+def_2014 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2014.nc")
+def_2015 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2015.nc")
+def_2016 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2016.nc")
+def_2017 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2017.nc")
+def_2018 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2018.nc")
+def_2019 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2019.nc")
+def_2020 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2020.nc")
+def_2021 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2021.nc")
+def_2022 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2022.nc")
+def_2023 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_2023.nc")
+
+def_stack <- c(
+  def_1994, def_1995, def_1996, def_1997,
+  def_1998, def_1999, def_2000, def_2001, def_2002,
+  def_2003, def_2004, def_2005, def_2006, def_2007,
+  def_2008, def_2009, def_2010, def_2011, def_2012,
+  def_2013, def_2014, def_2015, def_2016, def_2017,
+  def_2018, def_2019, def_2020, def_2021, def_2022,
+  def_2023
+)
+
+def_annual_by_year <- tapp(
+  def_stack,
+  index = rep(1:30, each = 12),
+  fun = sum,
+  na.rm = TRUE
+)
+
+def_30yr_normal <- mean(def_annual_by_year, na.rm = TRUE)
+
+
+def_buffer <- project(buffer, crs(def_annual_by_year))
+def_vals <- terra::extract(
+  def_annual_by_year,
+  buffer,
+  fun = mean,
+  na.rm = TRUE
+)
+def_df <- cbind(site_boundaries, def_vals)
+def_df$def_annual <- rowMeans(def_df[, -(1:ncol(site_boundaries))], na.rm = TRUE)
+def_sf <- st_as_sf(def_df, coords = c("lon", "lat"), crs = 4326)
+
+def_map <- ggplot() +
+  geom_sf(data = california, fill = "gray95", color = "white") +
+  geom_sf(data = def_sf, aes(color = def_annual), size = 3) +
+  scale_color_viridis_c(option = "C") +
+  coord_sf(xlim = c(-121.3, -120.6), ylim = c(39.3, 39.6)) +
+  theme_minimal() +
+  labs(color = "Annual Climatic Water Deficit (mm)")
+
+def_map
+
+def_df <- cbind(site_boundaries, def_vals[,-1])
+
+def_df$cwd_30yr_mean <- rowMeans(
+  def_df[, -(1:ncol(site_boundaries))],
+  na.rm = TRUE
+)
+def_table <- def_df[, c("id", "cwd_30yr_mean")]
+
+
+## vpd next
+vpd_1994 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_1994.nc")
+vpd_1995 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_1995.nc")
+vpd_1996 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_1996.nc")
+vpd_1997 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_1997.nc")
+vpd_1998 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_1998.nc")
+vpd_1999 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_1999.nc")
+vpd_2000 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2000.nc")
+vpd_2001 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2001.nc")
+vpd_2002 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2002.nc")
+vpd_2003 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2003.nc")
+vpd_2004 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2004.nc")
+vpd_2005 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2005.nc")
+vpd_2006 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2006.nc")
+vpd_2007 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2007.nc")
+vpd_2008 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2008.nc")
+vpd_2009 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2009.nc")
+vpd_2010 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2010.nc")
+vpd_2011 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2011.nc")
+vpd_2012 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2012.nc")
+vpd_2013 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2013.nc")
+vpd_2014 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2014.nc")
+vpd_2015 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2015.nc")
+vpd_2016 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2016.nc")
+vpd_2017 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2017.nc")
+vpd_2018 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2018.nc")
+vpd_2019 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2019.nc")
+vpd_2020 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2020.nc")
+vpd_2021 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2021.nc")
+vpd_2022 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2022.nc")
+vpd_2023 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_2023.nc")
+
+vpd_stack <- c(
+  vpd_1994, vpd_1994, vpd_1995, vpd_1996, vpd_1997,
+  vpd_1998, vpd_1999, vpd_2000, vpd_2001, vpd_2002,
+  vpd_2003, vpd_2004, vpd_2005, vpd_2006, vpd_2007,
+  vpd_2008, vpd_2009, vpd_2010, vpd_2011, vpd_2012,
+  vpd_2013, vpd_2014, vpd_2015, vpd_2016, vpd_2017,
+  vpd_2018, vpd_2019, vpd_2020, vpd_2021, vpd_2022,
+  vpd_2023
+)
+
+vpd_annual_by_year <- tapp(
+  vpd_stack,
+  index = rep(1:30, each = 12),
+  fun = mean,
+  na.rm = TRUE
+)
+vpd_buffer <- project(buffer, crs(vpd_annual_by_year))
+
+vpd_vals <- terra::extract(
+  vpd_annual_by_year,
+  vpd_buffer,
+  fun = mean,
+  na.rm = TRUE
+)
+
+vpd_df <- cbind(site_boundaries, vpd_vals[,-1])
+
+vpd_df$vpd_30yr_mean <- rowMeans(
+  vpd_df[, -(1:ncol(site_boundaries))],
+  na.rm = TRUE
+)
+
+vpd_sf <- st_as_sf(vpd_df, coords = c("lon","lat"), crs = 4326)
+
+vpd_map <- ggplot() +
+  geom_sf(data = california, fill = "gray95", color = "white") +
+  geom_sf(data = vpd_sf, aes(color = vpd_30yr_mean), size = 3) +
+  scale_color_viridis_c(option = "B") +
+  coord_sf(xlim = c(-121.3, -120.6), ylim = c(39.3, 39.6)) +
+  theme_minimal() +
+  labs(color = "Mean Annual VPD (kPa) (30-year normal)")
+
+vpd_map
+
+vpd_df <- cbind(site_boundaries, vpd_vals[,-1])
+vpd_df$vpd_30yr_mean <- rowMeans(
+  vpd_df[, -(1:ncol(site_boundaries))],
+  na.rm = TRUE
+)
+vpd_table <- vpd_df[, c("id", "vpd_30yr_mean")]
+
+## run for just 2023 analyses 
 
 ppt_2023 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc")
 tmax_2023 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_tmax_2023.nc")
@@ -40,6 +304,8 @@ site_boundaries <- data.frame(
   lon = c(-121.051720, -121.046958, -121.006063, -121.000819, -121.004718, -120.829953, -120.780825, -120.786236, -120.778930, -120.826322),
   lat = c(39.491387, 39.490947, 39.487019, 39.478789, 39.472552, 39.511469, 39.504699, 39.507502, 39.507644, 39.513851)
 )
+write.csv(site_boundaries, "site_boundaries.csv", row.names = FALSE)
+
 
 sites <- vect(site_boundaries, geom = c("lon", "lat"), crs = "EPSG:4326")
 sites_projection <- project(sites, "EPSG:32610")
@@ -189,5 +455,22 @@ C4 <- ggplot() +
   labs(color = "Annual VPD (kPa)")
 
 C4
+
+
+# climate normals
+normals <- climateR::getTerraClimNormals(
+  AOI = buffer_projection,
+  varname = c("ppt", "def", "tmax", "tmin", "vpd"),
+  scenario = "19812010"
+)
+
+varname = c("ppt", "def", "tmax", "tmin", "vpd")
+
+ppt_norm <- climateR::getTerraClimNormals(
+  AOI = buffer_projection,
+  varname = "ppt",
+  scenario = "19812010"
+)
+
 
 
