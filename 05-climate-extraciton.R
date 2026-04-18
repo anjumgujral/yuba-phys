@@ -19,6 +19,9 @@ install.packages("rnaturalearthdata")
 install.packages('maps')
 library(maps)
 
+save.image("my_workspace.RData")
+load("my_workspace.RData")
+
 california <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
 california <- california[california$ID == "california", ]
 calbound = AOI::aoi_get(state = "CA")
@@ -37,7 +40,6 @@ buffer <- buffer(sites_projection, width = 304.8)
 buffer_projection <- project(buffer, "EPSG:4326")
 
 # download 30 year climate normals for ppt
-ppt_1993 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1993.nc")
 ppt_1994 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1994.nc")
 ppt_1995 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1995.nc")
 ppt_1996 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_1996.nc")
@@ -80,44 +82,50 @@ ppt_stack <- c(
   ppt_2023
 )
 
-ppt_norm_monthly <- tapp(
+ppt_annual_by_year <- tapp(
   ppt_stack,
-  index = rep(1:12, times = 30), 
-  fun = mean,
+  index = rep(1:30, each = 12),
+  fun = sum,   
   na.rm = TRUE
 )
 
-# mean annual precip
-ppt_norm_annual <- sum(ppt_norm_monthly)
+ppt_buffer <- project(buffer, crs(ppt_annual_by_year))
 
-# --- PPT NORMAL EXTRACTION ---
+ppt_vals <- terra::extract(
+  ppt_annual_by_year,
+  ppt_buffer,
+  fun = mean,   # average across buffer area
+  na.rm = TRUE
+)
 
-# project buffers to match raster CRS
-ppt_buffer <- project(buffer, crs(ppt_norm_annual))
+ppt_df <- cbind(site_boundaries, ppt_vals[,-1])
 
-# extract mean annual ppt (already annual)
-ppt_vals <- extract(ppt_norm_annual, ppt_buffer, fun = mean, na.rm = TRUE)
+ppt_df$ppt_30yr_mean <- rowMeans(
+  ppt_df[, -(1:ncol(site_boundaries))],
+  na.rm = TRUE
+)
 
-# combine with site data
-ppt_df <- cbind(site_boundaries, ppt_vals)
-
-# rename extracted column
-names(ppt_df)[ncol(ppt_df)] <- "ppt_annual"
-
-# convert to sf
-ppt_sf <- st_as_sf(ppt_df, coords = c("lon","lat"), crs = 4326)
-
-# --- PLOT ---
+ppt_sf <- st_as_sf(ppt_df, coords = c("lon", "lat"), crs = 4326)
 
 ppt_map <- ggplot() +
   geom_sf(data = california, fill = "gray95", color = "white") +
-  geom_sf(data = ppt_sf, aes(color = ppt_annual), size = 3) +
-  scale_color_viridis_c() +
+  geom_sf(data = ppt_sf, aes(color = ppt_30yr_mean), size = 3) +
+  scale_color_viridis_c(option = "C") +
   coord_sf(xlim = c(-121.3, -120.6), ylim = c(39.3, 39.6)) +
   theme_minimal() +
-  labs(color = "Annual PPT 30-year Normals (1994-2023) (mm)")
+  labs(color = "30-year Mean Annual Accumulated Precipitation (mm)")
 
 ppt_map
+
+ppt_df <- cbind(site_boundaries, ppt_vals[,-1])
+
+ppt_df$ppt_30yr_mean <- rowMeans(
+  ppt_df[, -(1:ncol(site_boundaries))],
+  na.rm = TRUE
+)
+
+ppt_table <- ppt_df[, c("id", "ppt_30yr_mean")]
+
 
 # download 30 year normals for water deficit 
 def_1994 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_1994.nc")
@@ -283,6 +291,7 @@ vpd_df$vpd_30yr_mean <- rowMeans(
   na.rm = TRUE
 )
 vpd_table <- vpd_df[, c("id", "vpd_30yr_mean")]
+
 
 ## run for just 2023 analyses 
 
