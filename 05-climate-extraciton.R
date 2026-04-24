@@ -529,7 +529,8 @@ aet_map_by_region <- ggplot() +
               aes(x = lon, y = lat, fill = aet)) +
   scale_fill_viridis_c(option = "C",
                        direction = 1,
-                       name = "Annual AET (mm))") +
+                       limits = c(400,800),
+                       name = "Annual AET (mm)") +
   geom_sf(data = sites_sf,
           aes(shape = elevation),
           size = 3,
@@ -560,6 +561,66 @@ aet_table <- cbind(site_boundaries, aet_vals[,-1])
 colnames(aet_table)[ncol(aet_table)] <- "aet_30yr_mean"
 
 aet_table
+
+# PET
+pet_stack_stable <- rast(
+  paste0("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_pet_", years, ".nc")
+)
+
+pet_annual_by_year <- tapp(
+  pet_stack_stable,
+  index = rep(1:30, each = 12),
+  fun = sum,
+  na.rm = TRUE
+)
+
+pet_mean <- mean(pet_annual_by_year, na.rm = TRUE)
+writeRaster(pet_mean, "pet_30yr_mean.tif", overwrite = TRUE)
+
+pet_crop <- crop(pet_mean, small_box)
+#pet_crop <- mask(pet_crop, vect(california))
+
+pet_df_map <- as.data.frame(pet_crop, xy = TRUE, na.rm = TRUE)
+colnames(pet_df_map) <- c("lon", "lat", "pet")
+
+
+# make a map of VPD across the whole region with site locations identified
+pet_map_by_region <- ggplot() +
+  geom_raster(data = pet_df_map,
+              aes(x = lon, y = lat, fill = pet)) +
+  scale_fill_viridis_c(option = "C",
+                       direction = 1,
+                       name = "Annual PET (mm)") +
+  geom_sf(data = sites_sf,
+          aes(shape = elevation),
+          size = 3,
+          stroke = 1,
+          fill = NA,
+          color = "black") +
+  scale_shape_manual(
+    values = c(
+      "low" = 21,     # circle
+      "mid" = 22,  # square
+      "high" = 24     # triangle
+    )
+  ) +
+  geom_sf(data = california, fill = NA, color = "black") +
+  coord_sf(xlim = c(-121.3, -120.6),
+           ylim = c(39.3, 39.6)) +
+  theme_minimal()
+
+pet_map_by_region
+
+pet_vals <- terra::extract(
+  pet_mean,
+  vect(sites_sf)
+)
+
+
+pet_table <- cbind(site_boundaries, pet_vals[,-1])
+colnames(pet_table)[ncol(pet_table)] <- "pet_30yr_mean"
+
+pet_table
 ## run for just 2023 analyses 
 
 ppt_2023 <- terra::rast("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_ppt_2023.nc")
