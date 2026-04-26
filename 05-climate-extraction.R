@@ -1,46 +1,42 @@
 install.packages('AOI')
-library('AOI')
 install.packages('climateR')
-library(climateR)
 install.packages('terra')
-library(terra)
-install.packages('tmap')
-library(tmap)
-
-library(sf)
 install.packages('ggplot2')
-library(ggplot2)
+install.packages('tmap')
 install.packages('ggspatial')
-library(ggspatial)
-install.packages("prettymapr")
-library(prettymapr)
-install.packages("rnaturalearth")
+install.packages('prettymapr')
+install.packages('rnaturalearth')
 install.packages("rnaturalearthdata")
 install.packages('maps')
+
+library(tmap)
+library(AOI)
+library(sf)
+library(climateR)
+library(ggplot2)
+library(terra)
+library(ggspatial)
+library(prettymapr)
 library(maps)
 
+# load california boundary
 california <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
 california <- california[california$ID == "california", ]
-calbound = AOI::aoi_get(state = "CA")
+
+# create a bounding box for the north yuba
 small_box <- ext(-121.2, -119.3, 38.5, 40.0)
 
-# load in exact population locations 
+# load in site locations 
 site_boundaries <- data.frame(
   id = c("1","2","3", "4", "5", "7", "8", "9", "10", "11"),
   lon = c(-121.051720, -121.046958, -121.006063, -121.000819, -121.004718, -120.829953, -120.780825, -120.786236, -120.778930, -120.826322),
   lat = c(39.491387, 39.490947, 39.487019, 39.478789, 39.472552, 39.511469, 39.504699, 39.507502, 39.507644, 39.513851)
 )
-
-# assign elevation to sites for maps
+# assign elevation to sites for plotting purposes
 site_boundaries$elevation <- NA
 site_boundaries$elevation[site_boundaries$id %in% c("1","2")] <- "low"
 site_boundaries$elevation[site_boundaries$id %in% c("3","4","5")] <- "mid"
 site_boundaries$elevation[site_boundaries$id %in% c("7","8","9","10","11")] <- "high"
-
-sites <- vect(site_boundaries, geom = c("lon", "lat"), crs = "EPSG:4326")
-sites_projection <- project(sites, "EPSG:32610")
-buffer <- buffer(sites_projection, width = 304.8)
-buffer_projection <- project(buffer, "EPSG:4326")
 
 # download 30 year climate normals for ppt
 years <- 1994:2023
@@ -59,17 +55,21 @@ ppt_annual_by_year <- tapp(
 )
 # take the average of the 30 annual total precip rasters 
 ppt_mean <- mean(ppt_annual_by_year, na.rm = TRUE)
+
+# save raster as .tif for loading later if needed
 writeRaster(ppt_mean, "ppt_30yr_mean.tif", overwrite = TRUE)
 
+# crop ppt raster to study area
 ppt_crop <- crop(ppt_mean, small_box)
-#ppt_crop <- mask(ppt_crop, vect(california))
 
+# create a data frame of grid cell values for the study region
 ppt_df_map <- as.data.frame(ppt_crop, xy = TRUE, na.rm = TRUE)
 colnames(ppt_df_map) <- c("lon", "lat", "precip")
 
+# convert site table into spatial data points for extracting climate and plotting sites on map
 sites_sf <- st_as_sf(site_boundaries, coords = c("lon", "lat"), crs = 4326)
 
-# make a map of PPT across the whole region with site locations identified
+# plot PPT across the whole region with site locations identified
 ppt_map_by_region <- ggplot() +
   geom_raster(data = ppt_df_map,
               aes(x = lon, y = lat, fill = precip)) +
@@ -97,11 +97,9 @@ ppt_map_by_region <- ggplot() +
 
 ppt_map_by_region
 
-ppt_vals <- terra::extract(
-  ppt_mean,
-  vect(sites_sf)
-)
-
+# extract climate values for specific site locations, first make sure CRS matches between site points and climate data
+sites_vect <- terra::project(vect(sites_sf), crs(ppt_mean))
+ppt_vals <- terra::extract(ppt_mean, sites_vect)
 
 ppt_table <- cbind(site_boundaries, ppt_vals[,-1])
 colnames(ppt_table)[ncol(ppt_table)] <- "ppt_30yr_mean"
@@ -109,7 +107,7 @@ colnames(ppt_table)[ncol(ppt_table)] <- "ppt_30yr_mean"
 ppt_table
 
 
-# download 30 year normals for water deficit 
+# now run through the same code for climatic water deficit 
 def_stack_stable <- rast(
   paste0("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_def_", years, ".nc")
 )
@@ -125,13 +123,10 @@ def_mean <- mean(def_annual_by_year, na.rm = TRUE)
 writeRaster(def_mean, "def_30yr_mean.tif", overwrite = TRUE)
 
 def_crop <- crop(def_mean, small_box)
-#def_crop <- mask(def_crop, vect(california))
 
 def_df_map <- as.data.frame(def_crop, xy = TRUE, na.rm = TRUE)
 colnames(def_df_map) <- c("lon", "lat", "deficit")
 
-
-# make a map of DEF across the whole region with site locations identified
 def_map_by_region <- ggplot() +
   geom_raster(data = def_df_map,
               aes(x = lon, y = lat, fill = deficit)) +
@@ -159,11 +154,8 @@ def_map_by_region <- ggplot() +
 
 def_map_by_region
 
-def_vals <- terra::extract(
-  def_mean,
-  vect(sites_sf)
-)
-
+sites_vect <- terra::project(vect(sites_sf), crs(def_mean))
+def_vals <- terra::extract(def_mean, sites_vect)
 
 def_table <- cbind(site_boundaries, def_vals[,-1])
 colnames(def_table)[ncol(def_table)] <- "def_30yr_mean"
@@ -171,7 +163,7 @@ colnames(def_table)[ncol(def_table)] <- "def_30yr_mean"
 def_table
 
 
-## vpd next
+## VPD
 vpd_stack_stable <- rast(
   paste0("https://climate.northwestknowledge.net/TERRACLIMATE-DATA/TerraClimate_vpd_", years, ".nc")
 )
@@ -187,13 +179,10 @@ vpd_mean <- mean(vpd_annual_by_year, na.rm = TRUE)
 writeRaster(vpd_mean, "vpd_30yr_mean.tif", overwrite = TRUE)
 
 vpd_crop <- crop(vpd_mean, small_box)
-#vpd_crop <- mask(vpd_crop, vect(california))
 
 vpd_df_map <- as.data.frame(vpd_crop, xy = TRUE, na.rm = TRUE)
 colnames(vpd_df_map) <- c("lon", "lat", "VPD")
 
-
-# make a map of VPD across the whole region with site locations identified
 vpd_map_by_region <- ggplot() +
   geom_raster(data = vpd_df_map,
               aes(x = lon, y = lat, fill = VPD)) +
@@ -221,10 +210,8 @@ vpd_map_by_region <- ggplot() +
 
 vpd_map_by_region
 
-vpd_vals <- terra::extract(
-  vpd_mean,
-  vect(sites_sf)
-)
+sites_vect <- terra::project(vect(sites_sf), crs(vpd_mean))
+vpd_vals <- terra::extract(vpd_mean, sites_vect)
 
 vpd_table <- cbind(site_boundaries, vpd_vals[,-1])
 colnames(vpd_table)[ncol(def_table)] <- "vpd_30yr_mean"
@@ -247,13 +234,10 @@ aet_mean <- mean(aet_annual_by_year, na.rm = TRUE)
 writeRaster(aet_mean, "aet_30yr_mean.tif", overwrite = TRUE)
 
 aet_crop <- crop(aet_mean, small_box)
-#aet_crop <- mask(aet_crop, vect(california))
 
 aet_df_map <- as.data.frame(aet_crop, xy = TRUE, na.rm = TRUE)
 colnames(aet_df_map) <- c("lon", "lat", "aet")
 
-
-# make a map of VPD across the whole region with site locations identified
 aet_map_by_region <- ggplot() +
   geom_raster(data = aet_df_map,
               aes(x = lon, y = lat, fill = aet)) +
@@ -281,10 +265,8 @@ aet_map_by_region <- ggplot() +
 
 aet_map_by_region
 
-aet_vals <- terra::extract(
-  aet_mean,
-  vect(sites_sf)
-)
+sites_vect <- terra::project(vect(sites_sf), crs(aet_mean))
+aet_vals <- terra::extract(aet_mean, sites_vect)
 
 aet_table <- cbind(site_boundaries, aet_vals[,-1])
 colnames(aet_table)[ncol(aet_table)] <- "aet_30yr_mean"
@@ -307,13 +289,10 @@ pet_mean <- mean(pet_annual_by_year, na.rm = TRUE)
 writeRaster(pet_mean, "pet_30yr_mean.tif", overwrite = TRUE)
 
 pet_crop <- crop(pet_mean, small_box)
-#pet_crop <- mask(pet_crop, vect(california))
 
 pet_df_map <- as.data.frame(pet_crop, xy = TRUE, na.rm = TRUE)
 colnames(pet_df_map) <- c("lon", "lat", "pet")
 
-
-# make a map of VPD across the whole region with site locations identified
 pet_map_by_region <- ggplot() +
   geom_raster(data = pet_df_map,
               aes(x = lon, y = lat, fill = pet)) +
@@ -340,10 +319,8 @@ pet_map_by_region <- ggplot() +
 
 pet_map_by_region
 
-pet_vals <- terra::extract(
-  pet_mean,
-  vect(sites_sf)
-)
+sites_vect <- terra::project(vect(sites_sf), crs(pet_mean))
+pet_vals <- terra::extract(pet_mean, sites_vect)
 
 pet_table <- cbind(site_boundaries, pet_vals[,-1])
 colnames(pet_table)[ncol(pet_table)] <- "pet_30yr_mean"
