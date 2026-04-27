@@ -352,3 +352,37 @@ summary(emms1$contrasts) #automatically adjusts to tukey, for multiple compariso
 
 ```
 
+#table S6-7 models
+```{r}
+# load climate data 
+climate_df <- read.csv("climate_df.csv")
+
+#merge climate data with seedling physiology data for the following analyses
+trait_data2 <- merge(trait_data1, climate_df, by.x = "plot", by.y="id")
+
+# now test whether climate explains water potentials 
+# run the following model with each of the 5 climate variables (ppt, def, vpd, aet, pet) individually for both predawn and midday water potentials as the repsonse variable 
+
+# first scale all your climate variabels
+trait_data2$def_30yr_mean_scaled <-
+  scale(trait_data2$def_30yr_mean)
+
+trait_data2$ppt_30yr_mean_scaled <-
+  scale(trait_data2$ppt_30yr_mean)
+
+trait_data2$aet_30yr_mean_scaled <-
+  scale(trait_data2$aet_30yr_mean)
+
+trait_data2$pet_30yr_mean_scaled <-
+  scale(trait_data2$pet_30yr_mean)
+
+trait_data2$vpd_30yr_mean_scaled <-
+  scale(trait_data2$vpd_30yr_mean)
+
+mod8 <- lmer(predawn_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + def_30yr_mean_scaled + (1|plot) + (1|year), data = trait_data2)
+summary(mod8)
+
+plot(predawn_MPa_combined ~ def_30yr_normal, data = trait_data2)
+```
+
+
