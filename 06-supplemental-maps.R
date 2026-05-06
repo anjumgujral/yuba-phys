@@ -46,14 +46,13 @@ site_boundaries <- data.frame(
           39.511469,39.504699,39.507502,39.507644,39.513851)
 )
 site_boundaries$elevation <- NA
-site_boundaries$elevation[site_boundaries$id %in% c("1","2")]          <- "low"
-site_boundaries$elevation[site_boundaries$id %in% c("3","4","5")]      <- "mid"
+site_boundaries$elevation[site_boundaries$id %in% c("1","2")] <- "low"
+site_boundaries$elevation[site_boundaries$id %in% c("3","4","5")] <- "mid"
 site_boundaries$elevation[site_boundaries$id %in% c("7","8","9","10","11")] <- "high"
 
 sites_sf <- st_as_sf(site_boundaries, coords = c("lon", "lat"), crs = 4326)
 
 # create bounding boxes 
-
 small_box <- ext(-121.2, -119.3, 38.5, 40.0)   # terra extent (for crop)
 
 bbox_sf <- st_as_sf(st_as_sfc(                  
@@ -61,22 +60,23 @@ bbox_sf <- st_as_sf(st_as_sfc(
 ))
 
 # DEM, hillsahde/shaded relief, and aspect 
-
+# download elevation raster for bounding box
 dem <- get_elev_raster(locations = bbox_sf, z = 10, clip = "bbox")
 dem <- rast(dem)
+dem_crop <- crop(dem, small_box)
 
-dem_crop   <- crop(dem, small_box)
-slope      <- terrain(dem_crop, v = "slope",  unit = "radians")
+# compute terrain characteristics (slope and aspect) from pixels
+slope <- terrain(dem_crop, v = "slope",  unit = "radians")
 aspect_rad <- terrain(dem_crop, v = "aspect", unit = "radians")
 aspect_deg <- terrain(dem_crop, v = "aspect", unit = "degrees")
 
-hillshade  <- shade(slope, aspect_rad, angle = 45, direction = 315)
-
+# calculate hillshade (how light hits terrain based on slope and aspect)
+hillshade <- shade(slope, aspect_rad, angle = 45, direction = 315) # sun elevation and sun azimuth 
 hill_df <- as.data.frame(hillshade, xy = TRUE, na.rm = TRUE)
 colnames(hill_df) <- c("lon", "lat", "shade")
+
 hill_df$shade <- scales::rescale(hill_df$shade)
 hill_df$shade <- hill_df$shade^0.4   # contrast boost
-
 aspect_df <- as.data.frame(aspect_deg, xy = TRUE, na.rm = TRUE)
 colnames(aspect_df) <- c("lon", "lat", "aspect")
 
@@ -93,11 +93,10 @@ nhd_lines <- st_transform(nhd_lines, 4326)
 # Then filter to only permanent streams to reduce clutter
 nhd_lines <- nhd_lines[nhd_lines$ftype != 566, ]  # drop coastlines
 
-# keep only major streams — adjust threshold to taste
+# keep only major streams 
 nhd_major <- nhd_lines[nhd_lines$streamorde >= 4, ]
 
-### load in and crop climate rasters ###
-
+# load in and crop climate rasters 
 ppt_mean <- rast("ppt_30yr_mean.tif")
 ppt_crop <- crop(ppt_mean, small_box)
 ppt_df_map <- as.data.frame(ppt_crop, xy = TRUE, na.rm = TRUE)
@@ -274,27 +273,28 @@ PET
 # aspect is hard to visualize with climate but lets add a data table with climate
 # extracted by aspect
 aspect_deg_r <- terrain(dem_crop, v = "aspect", unit = "degrees")
+
+# aspect can be boiled down to northness and eastness
 northness <- cos(aspect_rad)   # 1 = true north, -1 = true south
 eastness<- sin(aspect_rad)   # 1 = true east,  -1 = true west
-
 northness_df <- as.data.frame(northness, xy = TRUE, na.rm = TRUE)
 colnames(northness_df) <- c("lon", "lat", "northness")
 
-# Extract aspect at each site
+# extract aspect, northness, and eastness for each site
 sites_sf$aspect <- terra::extract(aspect_deg, vect(sites_sf))[,2]
 sites_sf$northness<- terra::extract(northness, vect(sites_sf))[,2]
 sites_sf$eastness <- terra::extract(eastness, vect(sites_sf))[,2]
 
-
-# Pull out as plain data frame for modeling
 site_data <- st_drop_geometry(sites_sf)
 
-# McCune & Dyke heat load index — common in Sierra Nevada ecology
+# McCune & Dyke heat load index 
+# i.e. the relative potential direct incident solar radiation on a slope
+# determined from slope, aspect, and latitude
 site_data <- site_data |>
   mutate(
-    lat_rad    = 39.49 * pi / 180,       # your approximate latitude
+    lat_rad    = 39.49 * pi / 180,       
     aspect_rad = aspect * pi / 180,
-    slope_rad  = extract(slope, vect(sites_sf))[,2],  # add slope extraction above
+    slope_rad  = extract(slope, vect(sites_sf))[,2],  
     hli = exp(-1.467 +
                 1.582 * cos(lat_rad) * cos(slope_rad) -
                 1.5   * cos(aspect_rad) * sin(slope_rad) * sin(lat_rad) -
@@ -309,7 +309,7 @@ sites_sf$slope <- extract(slope, vect(sites_sf))[,2]  # slope in radians
 # Heat Load Index (McCune & Dyke 2002) — aspect-adjusted insolation
 sites_sf <- sites_sf |>
   mutate(
-    lat_rad = 39.49 * pi / 180,   # your study area latitude
+    lat_rad = 39.49 * pi / 180, 
     hli = exp(-1.467 +
                 1.582 * cos(lat_rad) * cos(slope) -
                 1.500 * cos(aspect * pi/180) * sin(slope) * sin(lat_rad) -
@@ -319,4 +319,19 @@ sites_sf <- sites_sf |>
 
 # use HLI to scale climate 
 sites_sf <- sites_sf |>
+  mutate(ppt_adjusted = ppt * hli)
+
+sites_sf <- sites_sf |>
+  mutate(cwd_adjusted = def * hli)
+
+sites_sf <- sites_sf |>
+  mutate(vpd_adjusted = vpd * hli)
+
+sites_sf <- sites_sf |>
+  mutate(aet_adjusted = aet * hli)
+
+sites_sf <- sites_sf |>
   mutate(pet_adjusted = pet * hli)
+
+site_data <- st_drop_geometry(sites_sf)
+write.csv(site_data, "adjusted_climate_df.csv", row.names = FALSE)
