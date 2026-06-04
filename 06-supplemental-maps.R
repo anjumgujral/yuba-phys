@@ -597,14 +597,6 @@ names(bcm) <- c(
   "tmx"
 )
 
-site_boundaries <- data.frame(
-  id  = c("1","2","3","4","5","7","8","9","10","11"),
-  lon = c(-121.051720,-121.046958,-121.006063,-121.000819,-121.004718,
-          -120.829953,-120.780825,-120.786236,-120.778930,-120.826322),
-  lat = c(39.491387,39.490947,39.487019,39.478789,39.472552,
-          39.511469,39.504699,39.507502,39.507644,39.513851)
-)
-
 sites_vect <- vect(
   site_boundaries,  
   geom = c("lon", "lat"),
@@ -616,9 +608,10 @@ sites_3310 <- project(sites_vect, crs(bcm))
 bcm_clim <- extract(bcm, sites_3310)
 
 sites_climate <- bind_cols(
-  sites,
+  site_boundaries,
   bcm_clim %>% select(-ID)
 )
+
 
 sites_sf <- st_as_sf(
   site_boundaries,
@@ -633,7 +626,6 @@ dem <- get_elev_raster(
 
 dem <- rast(dem)
 dem <- project(dem, crs(bcm))
-dem <- crop(dem, ext(bcm))
 
 # extent of all sites
 north_yuba_ext <- ext(sites_3310)
@@ -643,7 +635,6 @@ north_yuba_ext <- extend(north_yuba_ext, 5000)
 
 north_yuba_ext
 
-ppt_crop <- crop(bcm[["ppt"]], north_yuba_ext)
 
 dem_crop <- crop(dem, north_yuba_ext)
 
@@ -672,87 +663,83 @@ hill <- shade(
   direction = 315
 )
 
-contours <- as.contour(
-  dem_crop,
-  levels = seq(
-    500,
-    3000,
-    by = 250
-  )
-)
 
-
-contours_sf <- st_as_sf(contours)
-
-ppt_df <- as.data.frame(
-  ppt_crop,
-  xy = TRUE,
-  na.rm = TRUE
-)
-
-cwd_df <- as.data.frame(
-  cwd_crop,
-  xy = TRUE,
-  na.rm = TRUE
-)
-
-hill_df <- as.data.frame(
-  hill,
-  xy = TRUE,
-  na.rm = TRUE
-)
-
-sites_sf <- st_as_sf(sites_3310)
-
+ppt_df <- as.data.frame(ppt_crop, xy = TRUE, na.rm = TRUE)
+cwd_df <- as.data.frame(cwd_crop, xy = TRUE, na.rm = TRUE)
 dem_df <- as.data.frame(dem_crop, xy = TRUE)
+hill_df <- as.data.frame(hill, xy = TRUE, na.rm = TRUE)
 
 names(dem_df)[3] <- "elev"
-names(dem_df)
-
-geom_contour(
-  data = dem_df,
-  aes(x = x, y = y, z = elev),
-  breaks = seq(500, 3000, by = 250),
-  color = "black",
-  linewidth = 0.2,
-  alpha = 0.4
-)
-
-hill_df <- as.data.frame(hill, xy = TRUE, na.rm = TRUE)
 names(hill_df)[3] <- "hill"
-
-geom_raster(
-  data = hill_df,
-  aes(x = x, y = y, fill = hill),
-  alpha = 0.35
-)
 
 sites_sf <- sf::st_as_sf(sites_3310)
 
-geom_sf(
-  data = sites_sf,
-  shape = 21,
-  fill = "white",
-  color = "black",
-  size = 3
+sites_sf$elevation <- factor(
+  site_boundaries$elevation,
+  levels = c("low", "mid", "high")
 )
 
-hill_df <- as.data.frame(
-  hill,
+northness <- cos(aspect)
+north_df <- as.data.frame(
+  northness,
   xy = TRUE,
   na.rm = TRUE
 )
 
-names(hill_df)[3] <- "hill"
-
+names(north_df)[3] <- "northness"
 ggplot() +
-  
   # hillshade first
   geom_raster(
     data = hill_df,
     aes(x = x, y = y, fill = hill)
   ) +
+  scale_fill_gradient(
+    low = "black",
+    high = "white",
+    guide = "none"
+  ) +
+  ggnewscale::new_scale_fill() +
+  # BCM precipitation on top
+  geom_raster(
+    data = ppt_df,
+    aes(x = x, y = y, fill = ppt),
+    alpha = 0.65
+  ) +
+  scale_fill_viridis_c(
+    option = "viridis",
+    direction = -1,
+    name = "Mean annual precipitation (mm)"
+  ) +
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    fill = "white",
+    color = "black",
+    size = 3
+  ) +
   
+  scale_shape_manual(
+    name = "elevation",
+    values = c(
+      low = 21,
+      mid = 22,
+      high = 24
+    )
+  ) +
+  labs(x = "Longitude",
+       y = "Latitude") +
+  coord_sf() +
+  theme_classic()
+
+
+## plotting ppt with northness
+ggplot() +
+  
+  # hillshade
+  geom_raster(
+    data = hill_df,
+    aes(x = x, y = y, fill = hill)
+  ) +
   scale_fill_gradient(
     low = "black",
     high = "white",
@@ -761,43 +748,115 @@ ggplot() +
   
   ggnewscale::new_scale_fill() +
   
-  # BCM precipitation on top
+  # precipitation
   geom_raster(
     data = ppt_df,
-    aes(x = x, y = y, fill = ppt),
-    alpha = 0.65
+    aes(x = x, y = y, fill = ppt)
   ) +
-  
   scale_fill_viridis_c(
     option = "viridis",
-    name = "Mean annual precipitation (mm)"
+    direction = -1,
+    name = "MAP (mm)"
   ) +
   
-  geom_contour(
-    data = dem_df,
-    aes(x = x, y = y, z = elev),
-    breaks = seq(500, 3000, by = 500),
-    color = "black",
-    linewidth = 0.2,
-    alpha = 0.4
+  ggnewscale::new_scale_fill() +
+  
+  # northness overlay
+  geom_raster(
+    data = north_df,
+    aes(x = x, y = y, fill = northness),
+    alpha = 0.25
+  ) +
+  
+  scale_fill_gradient2(
+    low = "black",
+    mid = "gray70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
   ) +
   
   geom_sf(
     data = sites_sf,
-    shape = 21,
+    aes(shape = elevation),
     fill = "white",
     color = "black",
     size = 3
   ) +
   
+  scale_shape_manual(
+    values = c(
+      low = 21,
+      mid = 22,
+      high = 24
+    )
+  ) +
+  labs(x = "Longitude",
+       y = "Latitude") +
   coord_sf() +
   theme_classic()
 
-site_boundaries$elevation <- factor(
-  site_boundaries$elevation,
-  levels = c("low", "mid", "high")
-)
-
-
-
-
+## plotting cwd with northness
+ggplot() +
+  
+  # hillshade
+  geom_raster(
+    data = hill_df,
+    aes(x = x, y = y, fill = hill)
+  ) +
+  scale_fill_gradient(
+    low = "black",
+    high = "white",
+    guide = "none"
+  ) +
+  
+  ggnewscale::new_scale_fill() +
+  
+  # precipitation
+  geom_raster(
+    data = cwd_df,
+    aes(x = x, y = y, fill = cwd)
+  ) +
+  scale_fill_viridis_c(
+    option = "viridis",
+    direction = 1,
+    limits = c(100, 1200),
+    name = "CWD (mm)"
+  ) +
+  
+  ggnewscale::new_scale_fill() +
+  
+  # northness overlay
+  geom_raster(
+    data = north_df,
+    aes(x = x, y = y, fill = northness),
+    alpha = 0.25
+  ) +
+  
+  scale_fill_gradient2(
+    low = "black",
+    mid = "gray70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
+  ) +
+  
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    fill = "white",
+    color = "black",
+    size = 3
+  ) +
+  
+  scale_shape_manual(
+    values = c(
+      low = 21,
+      mid = 22,
+      high = 24
+    )
+  ) +
+  labs(x = "Longitude",
+       y = "Latitude") +
+  coord_sf() +
+  theme_classic()
