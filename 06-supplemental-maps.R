@@ -606,7 +606,7 @@ site_boundaries <- data.frame(
 )
 
 sites_vect <- vect(
-  site_boundaries,
+  site_boundaries,  
   geom = c("lon", "lat"),
   crs = "EPSG:4326"
 )
