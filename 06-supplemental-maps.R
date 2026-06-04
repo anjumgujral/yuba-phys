@@ -9,11 +9,12 @@ install.packages('rnaturalearth')
 install.packages("rnaturalearthdata")
 install.packages('maps')
 install.packages('elevatr')
+install.packages('spatialEco')
+install.packages('tidyterra')
+install.packages('viridis')
 
 library(tmap)
-library(AOI)
 library(sf)
-library(climateR)
 library(ggplot2)
 library(terra)
 library(ggspatial)
@@ -21,20 +22,15 @@ library(prettymapr)
 library(maps)
 library(elevatr)
 library(ggnewscale)
-
-library(sf)
-library(terra)
-library(elevatr)
-library(ggplot2)
-library(ggnewscale)
 library(scales)
-library(maps)
 library(rnaturalearth)
 library(rnaturalearthdata)
 library(nhdplusTools)
+library(spatialEco)
+library(tidyterra)
+library(viridis)
 
 # load site information 
-
 california <- ne_states(country = "United States of America", returnclass = "sf")
 california  <- california[california$name == "California", ]
 
@@ -60,7 +56,7 @@ bbox_sf <- st_as_sf(st_as_sfc(
 ))
 
 # DEM, hillsahde/shaded relief, and aspect 
-# download elevation raster for bounding box
+# download DEM raster for our bounding box using 'elevatr' package 
 dem <- get_elev_raster(locations = bbox_sf, z = 10, clip = "bbox")
 dem <- rast(dem)
 dem_crop <- crop(dem, small_box)
@@ -79,6 +75,11 @@ hill_df$shade <- scales::rescale(hill_df$shade)
 hill_df$shade <- hill_df$shade^0.4   # contrast boost
 aspect_df <- as.data.frame(aspect_deg, xy = TRUE, na.rm = TRUE)
 colnames(aspect_df) <- c("lon", "lat", "aspect")
+
+northness <- cos(aspect_rad)
+
+north_df <- as.data.frame(northness, xy = TRUE, na.rm = TRUE)
+colnames(north_df) <- c("lon", "lat", "northness")
 
 # load in raster for rivers
 rivers_sf   <- ne_download(scale = 10, type = "rivers_lake_centerlines",
@@ -123,151 +124,428 @@ pet_df_map <- as.data.frame(pet_crop, xy = TRUE, na.rm = TRUE)
 colnames(pet_df_map) <- c("lon", "lat", "pet")
 
 # maps 
+HILLSHADE <- ggplot() +
+  # hillshade background
+  geom_raster(
+    data = hill_df,
+    aes(x = lon, y = lat, fill = shade)
+  ) +
+  scale_fill_gradient(
+    low = "grey20",
+    high = "white",
+    guide = "none"
+  ) +
+  ggnewscale::new_scale_fill() +
+  # northness overlay
+  geom_raster(
+    data = north_df,
+    aes(x = lon, y = lat, fill = northness),
+    alpha = 0.40
+  ) +
+  scale_fill_gradient2(
+    low = "black",
+    mid = "grey70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
+  ) +
+  # streams
+  geom_sf(
+    data = nhd_major,
+    color = "dodgerblue4",
+    linewidth = 0.5
+  ) +
+  # field sites
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    size = 3.5,
+    fill = "plum",
+    color = "black",
+    stroke = 0.5
+  ) +
+  scale_shape_manual(
+    values = c(
+      "low"  = 21,
+      "mid"  = 22,
+      "high" = 24
+    )
+  ) +
+  coord_sf(
+    xlim = c(-121.08, -120.75),
+    ylim = c(39.46, 39.53),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11)
+  )
 
-# PPT
+HILLSHADE
+
 PPT <- ggplot() +
-  geom_tile(data = hill_df, aes(x = lon, y = lat, fill = shade), na.rm = TRUE) +
-  scale_fill_gradient(low = "grey25", high = "grey95", guide = "none", na.value = NA) +
-  new_scale_fill() +
-  geom_tile(data = aspect_df, aes(x = lon, y = lat, fill = aspect),
-            alpha = 0.8, na.rm = TRUE) +
-  scale_fill_gradientn(
-    colors = c("#bf812d", "#f6e8c3", "#c7eae5", "#35978f", "#c7eae5", "#f6e8c3", "#bf812d"),
-    values = scales::rescale(c(0, 90, 180, 270, 360)),
-    limits = c(0, 360), name = "Aspect (°)",
-    breaks = c(0, 90, 180, 270, 360), labels = c("N", "E", "S", "W", "N"),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.25))
+  # hillshade background
+  geom_raster(
+    data = hill_df,
+    aes(x = lon, y = lat, fill = shade)
   ) +
-  new_scale_fill() +
-  geom_tile(data = ppt_df_map, aes(x = lon, y = lat, fill = ppt),
-            alpha = 0.55, na.rm = TRUE) +
-  scale_fill_viridis_c(
-    option = "magma", begin = 0.1, end = 0.95, name = "PPT",
-    limits = c(min(ppt_df_map$ppt, na.rm = TRUE), max(ppt_df_map$ppt, na.rm = TRUE)),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.55))
+  scale_fill_gradient(
+    low = "grey20",
+    high = "white",
+    guide = "none"
   ) +
-  geom_sf(data = nhd_major, color = "black", linewidth = 0.6) + 
-  geom_sf(data = sites_sf, aes(shape = elevation), size = 3, fill = NA, color = "black") +
-  scale_shape_manual(values = c("low" = 21, "mid" = 22, "high" = 24)) +
-  coord_sf(xlim = c(min(hill_df$lon), -120.6), ylim = c(39.3, 39.6), expand = FALSE) +
-  theme_minimal()
+  ggnewscale::new_scale_fill() +
+  # northness overlay
+  geom_raster(
+    data = north_df,
+    aes(x = lon, y = lat, fill = northness),
+    alpha = 0.40
+  ) +
+  scale_fill_gradient2(
+    low = "black",
+    mid = "grey70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
+  ) +
+  ggnewscale::new_scale_fill() +
+  # PPT overlay
+  geom_raster(
+    data = ppt_df_map,
+    aes(x = lon, y = lat, fill = ppt),
+    alpha = 0.50
+  ) + scale_fill_viridis_c(
+    option = "magma",
+    direction = -1,
+    begin = 0.1,
+    end = 0.95,
+    limits = c(1100, 1800),
+    oob = scales::squish,
+    name = "PPT"
+  ) +
+  # streams
+  geom_sf(
+    data = nhd_major,
+    color = "dodgerblue4",
+    linewidth = 0.5
+  ) +
+  # field sites
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    size = 3.5,
+    color = "black",
+    stroke = 0.6
+  ) +
+  scale_shape_manual(
+    values = c(
+      "low"  = 21,
+      "mid"  = 22,
+      "high" = 24
+    )
+  ) +
+  coord_sf(
+    xlim = c(-121.12, -120.72),
+    ylim = c(39.44, 39.55),
+    expand = FALSE
+  ) +
+  labs(
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11)
+  )
 PPT
 
-# CWD
 CWD <- ggplot() +
-  geom_tile(data = hill_df, aes(x = lon, y = lat, fill = shade), na.rm = TRUE) +
-  scale_fill_gradient(low = "grey25", high = "grey95", guide = "none", na.value = NA) +
-  new_scale_fill() +
-  geom_tile(data = aspect_df, aes(x = lon, y = lat, fill = aspect),
-            alpha = 0.8, na.rm = TRUE) +
-  scale_fill_gradientn(
-    colors = c("#bf812d", "#f6e8c3", "#c7eae5", "#35978f", "#c7eae5", "#f6e8c3", "#bf812d"),
-    values = scales::rescale(c(0, 90, 180, 270, 360)),
-    limits = c(0, 360), name = "Aspect (°)",
-    breaks = c(0, 90, 180, 270, 360), labels = c("N", "E", "S", "W", "N"),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.25))
+  geom_raster(
+    data = hill_df,
+    aes(x = lon, y = lat, fill = shade)
   ) +
-  new_scale_fill() +
-  geom_tile(data = def_df_map, aes(x = lon, y = lat, fill = def),
-            alpha = 0.55, na.rm = TRUE) +
+  scale_fill_gradient(
+    low = "grey20",
+    high = "white",
+    guide = "none"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = north_df,
+    aes(x = lon, y = lat, fill = northness),
+    alpha = 0.40
+  ) +
+  scale_fill_gradient2(
+    low = "black",
+    mid = "grey70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = def_df_map,
+    aes(x = lon, y = lat, fill = def),
+    alpha = 0.50
+  ) +
   scale_fill_viridis_c(
-    option = "magma", direction = -1, begin = 0.1, end = 0.95, name = "CWD",
-    limits = c(min(def_df_map$def, na.rm = TRUE), max(def_df_map$def, na.rm = TRUE)),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.55))
+    option = "magma",
+    begin = 0.1,
+    end = 0.95,
+    limits = c(300, 700),
+    oob = scales::squish,
+    name = "CWD"
   ) +
-  geom_sf(data = nhd_major, color = "black", linewidth = 0.6) + 
-  geom_sf(data = sites_sf, aes(shape = elevation), size = 3, fill = NA, color = "black") +
-  scale_shape_manual(values = c("low" = 21, "mid" = 22, "high" = 24)) +
-  coord_sf(xlim = c(min(hill_df$lon), -120.6), ylim = c(39.3, 39.6), expand = FALSE) +
-  theme_minimal()
+  geom_sf(
+    data = nhd_major,
+    color = "dodgerblue4",
+    linewidth = 0.5
+  ) +
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    size = 3.5,
+    color = "black",
+    stroke = 0.6
+  ) +
+  scale_shape_manual(
+    values = c("low" = 21,
+               "mid" = 22,
+               "high" = 24)
+  ) +
+  coord_sf(
+    xlim = c(-121.12, -120.72),
+    ylim = c(39.44, 39.55),
+    expand = FALSE
+  ) +
+  labs(x = "Longitude",
+       y = "Latitude") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11)
+  )
 CWD
 
-# VPD
 VPD <- ggplot() +
-  geom_tile(data = hill_df, aes(x = lon, y = lat, fill = shade), na.rm = TRUE) +
-  scale_fill_gradient(low = "grey25", high = "grey95", guide = "none", na.value = NA) +
-  new_scale_fill() +
-  geom_tile(data = aspect_df, aes(x = lon, y = lat, fill = aspect),
-            alpha = 0.8, na.rm = TRUE) +
-  scale_fill_gradientn(
-    colors = c("#bf812d", "#f6e8c3", "#c7eae5", "#35978f", "#c7eae5", "#f6e8c3", "#bf812d"),
-    values = scales::rescale(c(0, 90, 180, 270, 360)),
-    limits = c(0, 360), name = "Aspect (°)",
-    breaks = c(0, 90, 180, 270, 360), labels = c("N", "E", "S", "W", "N"),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.25))
+  geom_raster(
+    data = hill_df,
+    aes(x = lon, y = lat, fill = shade)
   ) +
-  new_scale_fill() +
-  geom_tile(data = vpd_df_map, aes(x = lon, y = lat, fill = vpd),
-            alpha = 0.55, na.rm = TRUE) +
+  scale_fill_gradient(
+    low = "grey20",
+    high = "white",
+    guide = "none"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = north_df,
+    aes(x = lon, y = lat, fill = northness),
+    alpha = 0.40
+  ) +
+  scale_fill_gradient2(
+    low = "black",
+    mid = "grey70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = vpd_df_map,
+    aes(x = lon, y = lat, fill = vpd),
+    alpha = 0.50
+  ) +
   scale_fill_viridis_c(
-    option = "magma", begin = 0.1, end = 0.95, name = "VPD",
-    limits = c(min(vpd_df_map$vpd, na.rm = TRUE), max(vpd_df_map$vpd, na.rm = TRUE)),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.55))
+    option = "magma",
+    begin = 0.1,
+    end = 0.95,
+    limits = c(0.7, 1.1),
+    oob = scales::squish,
+    name = "VPD"
   ) +
-  geom_sf(data = nhd_major, color = "black", linewidth = 0.6) + 
-  geom_sf(data = sites_sf, aes(shape = elevation), size = 3, fill = NA, color = "black") +
-  scale_shape_manual(values = c("low" = 21, "mid" = 22, "high" = 24)) +
-  coord_sf(xlim = c(min(hill_df$lon), -120.6), ylim = c(39.3, 39.6), expand = FALSE) +
-  theme_minimal()
+  geom_sf(
+    data = nhd_major,
+    color = "dodgerblue4",
+    linewidth = 0.5
+  ) +
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    size = 3.5,
+    color = "black",
+    stroke = 0.6
+  ) +
+  scale_shape_manual(
+    values = c("low" = 21,
+               "mid" = 22,
+               "high" = 24)
+  ) +
+  coord_sf(
+    xlim = c(-121.12, -120.72),
+    ylim = c(39.44, 39.55),
+    expand = FALSE
+  ) +
+  labs(x = "Longitude",
+       y = "Latitude") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11)
+  )
 VPD
 
-# AET
-AET <- ggplot() +
-  geom_tile(data = hill_df, aes(x = lon, y = lat, fill = shade), na.rm = TRUE) +
-  scale_fill_gradient(low = "grey25", high = "grey95", guide = "none", na.value = NA) +
-  new_scale_fill() +
-  geom_tile(data = aspect_df, aes(x = lon, y = lat, fill = aspect),
-            alpha = 0.8, na.rm = TRUE) +
-  scale_fill_gradientn(
-    colors = c("#bf812d", "#f6e8c3", "#c7eae5", "#35978f", "#c7eae5", "#f6e8c3", "#bf812d"),
-    values = scales::rescale(c(0, 90, 180, 270, 360)),
-    limits = c(0, 360), name = "Aspect (°)",
-    breaks = c(0, 90, 180, 270, 360), labels = c("N", "E", "S", "W", "N"),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.25))
+PET <- ggplot() +
+  geom_raster(
+    data = hill_df,
+    aes(x = lon, y = lat, fill = shade)
   ) +
-  new_scale_fill() +
-  geom_tile(data = aet_df_map, aes(x = lon, y = lat, fill = aet),
-            alpha = 0.55, na.rm = TRUE) +
+  scale_fill_gradient(
+    low = "grey20",
+    high = "white",
+    guide = "none"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = north_df,
+    aes(x = lon, y = lat, fill = northness),
+    alpha = 0.40
+  ) +
+  scale_fill_gradient2(
+    low = "black",
+    mid = "grey70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = pet_df_map,
+    aes(x = lon, y = lat, fill = pet),
+    alpha = 0.50
+  ) +
   scale_fill_viridis_c(
-    option = "magma", begin = 0.1, end = 0.95, name = "AET",
-    limits = c(min(aet_df_map$aet, na.rm = TRUE), max(aet_df_map$aet, na.rm = TRUE)),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.55))
+    option = "magma",
+    direction = 1,
+    begin = 0.1,
+    end = 0.95,
+    limits = c(1000, 1400),
+    oob = scales::squish,
+    name = "PET"
   ) +
-  geom_sf(data = nhd_major, color = "black", linewidth = 0.6) + 
-  geom_sf(data = sites_sf, aes(shape = elevation), size = 3, fill = NA, color = "black") +
-  scale_shape_manual(values = c("low" = 21, "mid" = 22, "high" = 24)) +
-  coord_sf(xlim = c(min(hill_df$lon), -120.6), ylim = c(39.3, 39.6), expand = FALSE) +
-  theme_minimal()
+  geom_sf(
+    data = nhd_major,
+    color = "dodgerblue4",
+    linewidth = 0.5
+  ) +
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    size = 3.5,
+    color = "black",
+    stroke = 0.6
+  ) +
+  scale_shape_manual(
+    values = c("low" = 21,
+               "mid" = 22,
+               "high" = 24)
+  ) +
+  coord_sf(
+    xlim = c(-121.12, -120.72),
+    ylim = c(39.44, 39.55),
+    expand = FALSE
+  ) +
+  labs(x = "Longitude",
+       y = "Latitude") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11)
+  )
+
+PET
+
+AET <- ggplot() +
+  geom_raster(
+    data = hill_df,
+    aes(x = lon, y = lat, fill = shade)
+  ) +
+  scale_fill_gradient(
+    low = "grey20",
+    high = "white",
+    guide = "none"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = north_df,
+    aes(x = lon, y = lat, fill = northness),
+    alpha = 0.40
+  ) +
+  scale_fill_gradient2(
+    low = "black",
+    mid = "grey70",
+    high = "white",
+    midpoint = 0,
+    name = "Northness"
+  ) +
+  ggnewscale::new_scale_fill() +
+  geom_raster(
+    data = aet_df_map,
+    aes(x = lon, y = lat, fill = aet),
+    alpha = 0.50
+  ) +
+  scale_fill_viridis_c(
+    option = "magma",
+    direction = 1,
+    begin = 0.1,
+    end = 0.95,
+    limits = c(600,800),
+    oob = scales::squish,
+    name = "AET"
+  ) +
+  geom_sf(
+    data = nhd_major,
+    color = "dodgerblue4",
+    linewidth = 0.5
+  ) +
+  geom_sf(
+    data = sites_sf,
+    aes(shape = elevation),
+    size = 3.5,
+    color = "black",
+    stroke = 0.6
+  ) +
+  scale_shape_manual(
+    values = c("low" = 21,
+               "mid" = 22,
+               "high" = 24)
+  ) +
+  coord_sf(
+    xlim = c(-121.12, -120.72),
+    ylim = c(39.44, 39.55),
+    expand = FALSE
+  ) +
+  labs(x = "Longitude",
+       y = "Latitude") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    legend.title = element_text(size = 12),
+    legend.text = element_text(size = 11)
+  )
 AET
 
-#PET
-PET <- ggplot() +
-  geom_tile(data = hill_df, aes(x = lon, y = lat, fill = shade), na.rm = TRUE) +
-  scale_fill_gradient(low = "grey25", high = "grey95", guide = "none", na.value = NA) +
-  new_scale_fill() +
-  geom_tile(data = aspect_df, aes(x = lon, y = lat, fill = aspect),
-            alpha = 0.8, na.rm = TRUE) +
-  scale_fill_gradientn(
-    colors = c("#bf812d", "#f6e8c3", "#c7eae5", "#35978f", "#c7eae5", "#f6e8c3", "#bf812d"),
-    values = scales::rescale(c(0, 90, 180, 270, 360)),
-    limits = c(0, 360), name = "Aspect (°)",
-    breaks = c(0, 90, 180, 270, 360), labels = c("N", "E", "S", "W", "N"),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.25))
-  ) +
-  new_scale_fill() +
-  geom_tile(data = pet_df_map, aes(x = lon, y = lat, fill = pet),
-            alpha = 0.55, na.rm = TRUE) +
-  scale_fill_viridis_c(
-    option = "magma", begin = 0.1, end = 0.95, name = "PET",
-    limits = c(min(pet_df_map$pet, na.rm = TRUE), max(pet_df_map$pet, na.rm = TRUE)),
-    guide  = guide_colorbar(override.aes = list(alpha = 0.55))
-  ) +
-  geom_sf(data = nhd_major, color = "black", linewidth = 0.6) + 
-  geom_sf(data = sites_sf, aes(shape = elevation), size = 3, fill = NA, color = "black") +
-  scale_shape_manual(values = c("low" = 21, "mid" = 22, "high" = 24)) +
-  coord_sf(xlim = c(min(hill_df$lon), -120.6), ylim = c(39.3, 39.6), expand = FALSE) +
-  theme_minimal()
-PET
 
 # Heat load index, aspect adjusted climate
 # aspect is hard to visualize with climate but lets add a data table with climate
@@ -284,54 +562,242 @@ colnames(northness_df) <- c("lon", "lat", "northness")
 sites_sf$aspect <- terra::extract(aspect_deg, vect(sites_sf))[,2]
 sites_sf$northness<- terra::extract(northness, vect(sites_sf))[,2]
 sites_sf$eastness <- terra::extract(eastness, vect(sites_sf))[,2]
+sites_sf$slope <- terra::extract(slope, vect(sites_sf))[,2]
 
-site_data <- st_drop_geometry(sites_sf)
+# Extract climate values at each site
+sites_sf$ppt <- terra::extract(ppt_crop, vect(sites_sf))[,2]
+sites_sf$def <- terra::extract(def_crop, vect(sites_sf))[,2]
+sites_sf$vpd <- terra::extract(vpd_crop, vect(sites_sf))[,2]
+sites_sf$aet <- terra::extract(aet_crop, vect(sites_sf))[,2]
+sites_sf$pet <- terra::extract(pet_crop, vect(sites_sf))[,2]
 
 # McCune & Dyke heat load index 
 # i.e. the relative potential direct incident solar radiation on a slope
 # determined from slope, aspect, and latitude
-site_data <- site_data |>
-  mutate(
-    lat_rad    = 39.49 * pi / 180,       
-    aspect_rad = aspect * pi / 180,
-    slope_rad  = extract(slope, vect(sites_sf))[,2],  
-    hli = exp(-1.467 +
-                1.582 * cos(lat_rad) * cos(slope_rad) -
-                1.5   * cos(aspect_rad) * sin(slope_rad) * sin(lat_rad) -
-                0.262 * sin(lat_rad) * sin(slope_rad) +
-                0.607 * sin(aspect_rad) * sin(slope_rad))
+
+# Calculate HLI directly from DEM 
+hli_raster <- spatialEco::hli(dem_crop)
+sites_sf$hli <- terra::extract(hli_raster, vect(sites_sf))[,2]
+  
+write.csv(sites_sf, "site_data.csv", row.names = FALSE)
+
+### Basin Characterization Model workflow ###
+
+#load in BCM data 
+bcm <- rast("clean_climate_1981_2010.tif")
+
+names(bcm) <- c(
+  "cwd",
+  "pck",
+  "ppt",
+  "rch",
+  "run",
+  "str",
+  "tmn",
+  "tmx"
+)
+
+site_boundaries <- data.frame(
+  id  = c("1","2","3","4","5","7","8","9","10","11"),
+  lon = c(-121.051720,-121.046958,-121.006063,-121.000819,-121.004718,
+          -120.829953,-120.780825,-120.786236,-120.778930,-120.826322),
+  lat = c(39.491387,39.490947,39.487019,39.478789,39.472552,
+          39.511469,39.504699,39.507502,39.507644,39.513851)
+)
+
+sites_vect <- vect(
+  site_boundaries,
+  geom = c("lon", "lat"),
+  crs = "EPSG:4326"
+)
+
+sites_3310 <- project(sites_vect, crs(bcm))
+
+bcm_clim <- extract(bcm, sites_3310)
+
+sites_climate <- bind_cols(
+  sites,
+  bcm_clim %>% select(-ID)
+)
+
+sites_sf <- st_as_sf(
+  site_boundaries,
+  coords = c("lon", "lat"),
+  crs = 4326
+)
+
+dem <- get_elev_raster(
+  sites_sf,
+  z = 10
+)
+
+dem <- rast(dem)
+dem <- project(dem, crs(bcm))
+dem <- crop(dem, ext(bcm))
+
+# extent of all sites
+north_yuba_ext <- ext(sites_3310)
+
+# add 5 km buffer on all sides
+north_yuba_ext <- extend(north_yuba_ext, 5000)
+
+north_yuba_ext
+
+ppt_crop <- crop(bcm[["ppt"]], north_yuba_ext)
+
+dem_crop <- crop(dem, north_yuba_ext)
+
+cwd_crop <- crop(bcm[["cwd"]], north_yuba_ext)
+
+tmx_crop <- crop(bcm[["tmx"]], north_yuba_ext)
+
+ppt_crop <- crop(bcm[["ppt"]], north_yuba_ext)
+
+slope <- terrain(
+  dem_crop,
+  v = "slope",
+  unit = "radians"
+)
+
+aspect <- terrain(
+  dem_crop,
+  v = "aspect",
+  unit = "radians"
+)
+
+hill <- shade(
+  slope,
+  aspect,
+  angle = 45,
+  direction = 315
+)
+
+contours <- as.contour(
+  dem_crop,
+  levels = seq(
+    500,
+    3000,
+    by = 250
   )
+)
 
-# lets use extract climate based on topographic position and aspect (HLI)
-# extract slope at each site 
-sites_sf$slope <- extract(slope, vect(sites_sf))[,2]  # slope in radians
 
-# Heat Load Index (McCune & Dyke 2002) — aspect-adjusted insolation
-sites_sf <- sites_sf |>
-  mutate(
-    lat_rad = 39.49 * pi / 180, 
-    hli = exp(-1.467 +
-                1.582 * cos(lat_rad) * cos(slope) -
-                1.500 * cos(aspect * pi/180) * sin(slope) * sin(lat_rad) -
-                0.262 * sin(lat_rad) * sin(slope) +
-                0.607 * sin(aspect * pi/180) * sin(slope))
-  )
+contours_sf <- st_as_sf(contours)
 
-# use HLI to scale climate 
-sites_sf <- sites_sf |>
-  mutate(ppt_adjusted = ppt * hli)
+ppt_df <- as.data.frame(
+  ppt_crop,
+  xy = TRUE,
+  na.rm = TRUE
+)
 
-sites_sf <- sites_sf |>
-  mutate(cwd_adjusted = def * hli)
+cwd_df <- as.data.frame(
+  cwd_crop,
+  xy = TRUE,
+  na.rm = TRUE
+)
 
-sites_sf <- sites_sf |>
-  mutate(vpd_adjusted = vpd * hli)
+hill_df <- as.data.frame(
+  hill,
+  xy = TRUE,
+  na.rm = TRUE
+)
 
-sites_sf <- sites_sf |>
-  mutate(aet_adjusted = aet * hli)
+sites_sf <- st_as_sf(sites_3310)
 
-sites_sf <- sites_sf |>
-  mutate(pet_adjusted = pet * hli)
+dem_df <- as.data.frame(dem_crop, xy = TRUE)
 
-site_data <- st_drop_geometry(sites_sf)
-write.csv(site_data, "adjusted_climate_df.csv", row.names = FALSE)
+names(dem_df)[3] <- "elev"
+names(dem_df)
+
+geom_contour(
+  data = dem_df,
+  aes(x = x, y = y, z = elev),
+  breaks = seq(500, 3000, by = 250),
+  color = "black",
+  linewidth = 0.2,
+  alpha = 0.4
+)
+
+hill_df <- as.data.frame(hill, xy = TRUE, na.rm = TRUE)
+names(hill_df)[3] <- "hill"
+
+geom_raster(
+  data = hill_df,
+  aes(x = x, y = y, fill = hill),
+  alpha = 0.35
+)
+
+sites_sf <- sf::st_as_sf(sites_3310)
+
+geom_sf(
+  data = sites_sf,
+  shape = 21,
+  fill = "white",
+  color = "black",
+  size = 3
+)
+
+hill_df <- as.data.frame(
+  hill,
+  xy = TRUE,
+  na.rm = TRUE
+)
+
+names(hill_df)[3] <- "hill"
+
+ggplot() +
+  
+  # hillshade first
+  geom_raster(
+    data = hill_df,
+    aes(x = x, y = y, fill = hill)
+  ) +
+  
+  scale_fill_gradient(
+    low = "black",
+    high = "white",
+    guide = "none"
+  ) +
+  
+  ggnewscale::new_scale_fill() +
+  
+  # BCM precipitation on top
+  geom_raster(
+    data = ppt_df,
+    aes(x = x, y = y, fill = ppt),
+    alpha = 0.65
+  ) +
+  
+  scale_fill_viridis_c(
+    option = "viridis",
+    name = "Mean annual precipitation (mm)"
+  ) +
+  
+  geom_contour(
+    data = dem_df,
+    aes(x = x, y = y, z = elev),
+    breaks = seq(500, 3000, by = 500),
+    color = "black",
+    linewidth = 0.2,
+    alpha = 0.4
+  ) +
+  
+  geom_sf(
+    data = sites_sf,
+    shape = 21,
+    fill = "white",
+    color = "black",
+    size = 3
+  ) +
+  
+  coord_sf() +
+  theme_classic()
+
+site_boundaries$elevation <- factor(
+  site_boundaries$elevation,
+  levels = c("low", "mid", "high")
+)
+
+
+
+
