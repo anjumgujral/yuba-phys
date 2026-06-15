@@ -612,6 +612,7 @@ sites_climate <- bind_cols(
   bcm_clim %>% select(-ID)
 )
 
+write.csv(sites_climate, "bcm_climate.csv", row.names = FALSE)
 
 sites_sf <- st_as_sf(
   site_boundaries,

@@ -21,6 +21,7 @@ library(prettymapr)
 library(maps)
 library(elevatr)
 library(ggnewscale)
+library(tidyterra)
 
 # load california boundary
 california <- st_as_sf(map("state", plot = FALSE, fill = TRUE))
@@ -348,3 +349,49 @@ climate_df <- merge(
 
 climate_df <- climate_df[, c("id", "pet_30yr_mean", "vpd_30yr_mean", "ppt_30yr_mean", "def_30yr_mean", "aet_30yr_mean")]
 write.csv(climate_df, "climate_df.csv", row.names = FALSE)
+
+# terra climate wasn't super informative for water potentials at my field sites
+# lets try something a bit more fine scale (BCM)
+
+# load in .tif file for BCM (bands associated with different variables)
+
+bcm <- rast("clean_climate_1981_2010.tif")
+
+names(bcm) <- c(
+  "cwd",
+  "pck",
+  "ppt",
+  "rch",
+  "run",
+  "str",
+  "tmn",
+  "tmx"
+)
+
+# load in site locations 
+site_boundaries <- data.frame(
+  id = c("1","2","3", "4", "5", "7", "8", "9", "10", "11"),
+  lon = c(-121.051720, -121.046958, -121.006063, -121.000819, -121.004718, -120.829953, -120.780825, -120.786236, -120.778930, -120.826322),
+  lat = c(39.491387, 39.490947, 39.487019, 39.478789, 39.472552, 39.511469, 39.504699, 39.507502, 39.507644, 39.513851)
+)
+
+sites_vect <- vect(
+  site_boundaries,
+  geom = c("lon", "lat"),
+  crs = "EPSG:4326"
+)
+
+sites_3310 <- project(sites_vect, crs(bcm))
+
+bcm_clim <- extract(bcm, sites_3310)
+head(bcm_clim)
+
+bcm_clim <- cbind(
+  site_id = site_boundaries$id,
+  bcm_clim[, -1]
+)
+
+write.csv(bcm_clim, "bcm_clim.csv", row.names = FALSE)
+
+
+

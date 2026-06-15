@@ -28,7 +28,7 @@ library('RColorBrewer')
 
 # load data
 ```{r}
-trait_data1<- read.csv("/Users/anjumgujral/Box Sync/yuba-phys_data/traits/yuba-phys-prepped-field-data-2024_2025.csv")
+trait_data1<- read.csv("yuba-phys-prepped-field-data-2024_2025.csv")
 
 # subset data frame by species 
 ABCO <- trait_data1[trait_data1$species == 'ABCO',]
@@ -269,7 +269,7 @@ t.test(predawn_MPa_combined ~ wp_year,
 # run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S1
 # run this model for the following response variables 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean'
 
-mod1 <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
+mod1 <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = ABCO)
 summary(mod1)
 
 ```
@@ -279,7 +279,7 @@ summary(mod1)
 # run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S2
 # run this model for the following response variables 'P50_combined', 'HSM_midday_combined' and 'HSM_midday_P50_mean'
 
-mod2 <- lmer(P50_combined ~diameter_complete_scaled * predawn_scaled * canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = ABCO)
+mod2 <- lmer(P50_combined ~diameter_complete_scaled * predawn_scaled * canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = ABCO)
 summary(mod2)
 
 ```
@@ -338,11 +338,11 @@ ggplot(trait_data1, aes(x = log(diameter_complete), y = log(internode_length_1_2
 # table S4-5 models
 ```{r}
 # run this model for the following response variables for table S4
-mod6 <- lmer(predawn_MPa_combined ~ species + diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|year), data = trait_data1)
+mod6 <- lmer(predawn_MPa_combined ~ species + diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = trait_data1)
 summary(mod6)
 
 # run this model for the following response variables for table S5
-mod7 <- lmer(predawn_MPa_combined ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|year), data = trait_data1)
+mod7 <- lmer(predawn_MPa_combined ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|wp_year), data = trait_data1)
 summary(mod7)
 
 # table 5 pairwise comparisons using emmeans
@@ -352,7 +352,7 @@ summary(emms1$contrasts) #automatically adjusts to tukey, for multiple compariso
 
 ```
 
-#table S6-7 models
+#table S8 models
 ```{r}
 # load climate data 
 climate_df <- read.csv("climate_df.csv")
@@ -363,26 +363,26 @@ trait_data2 <- merge(trait_data1, climate_df, by.x = "plot", by.y="id")
 # now test whether climate explains water potentials 
 # run the following model with each of the 5 climate variables (ppt, def, vpd, aet, pet) individually for both predawn and midday water potentials as the repsonse variable 
 
-# first scale all your climate variabels
-trait_data2$def_30yr_mean_scaled <-
-  scale(trait_data2$def_30yr_mean)
+trait_data2$def_scaled <- as.vector(scale(trait_data2$def_30yr_mean))
+trait_data2$ppt_scaled <- as.vector(scale(trait_data2$ppt_30yr_mean))
 
-trait_data2$ppt_30yr_mean_scaled <-
-  scale(trait_data2$ppt_30yr_mean)
-
-trait_data2$aet_30yr_mean_scaled <-
-  scale(trait_data2$aet_30yr_mean)
-
-trait_data2$pet_30yr_mean_scaled <-
-  scale(trait_data2$pet_30yr_mean)
-
-trait_data2$vpd_30yr_mean_scaled <-
-  scale(trait_data2$vpd_30yr_mean)
-
-mod8 <- lmer(predawn_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + def_30yr_mean_scaled + (1|plot) + (1|year), data = trait_data2)
+mod8 <- lmer(midday_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + ppt_scaled + (1|plot) + (1|wp_year), data = trait_data2)
 summary(mod8)
 
-plot(predawn_MPa_combined ~ def_30yr_normal, data = trait_data2)
+
+# load bcm climate data 
+bcm_climate <- read.csv("bcm_climate.csv")
+
+#merge climate data with seedling physiology data for the following analyses
+trait_data2 <- merge(trait_data1, bcm_climate, by.x = "plot", by.y="id")
+
+trait_data2$cwd_scaled <- as.vector(scale(trait_data2$cwd))
+trait_data2$ppt_scaled <- as.vector(scale(trait_data2$ppt))
+
+mod8 <- lmer(midday_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + ppt_scaled + (1|plot) + (1|wp_year), data = trait_data2)
+summary(mod8)
+
+
 ```
 
 

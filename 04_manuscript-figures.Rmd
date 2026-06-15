@@ -66,7 +66,7 @@ species_list_elev <- list(
 # Figure 1 - WP x diameter
 ```{r}
 ### FIGURE 1A: Predawn by size
-## plotting model fit
+## plotting model fit trend lines and raw data points
 
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -172,6 +172,8 @@ scale_alpha_manual(values = c(
 Fig1A
 
 ### FIGURE 1B: Midday by size
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -286,9 +288,8 @@ grid.arrange(Fig1A, Fig1B, ncol = 2)
 # Figure 2- P50
 ## diameter
 ```{r}
-
 ### FIGURE 2A: P50 by size
-## plotting model fit
+## plotting model fit trend lines and raw data points
 
 all_preds_P50 <- data.frame()
 model_summaries_P50 <- data.frame()
@@ -349,11 +350,11 @@ for (sp in names(species_list)) {
   all_preds_P50 <- dplyr::bind_rows(all_preds_P50, newdata)
 }
 
-### FIGURE 2A: P50
+### FIGURE 2A: P50 by diameter
 Fig2A <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = diameter_complete, y = P50_combined, color = species),
-             alpha = 0.2, size = 1.5, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(
@@ -394,6 +395,8 @@ Fig2A
 ## predawn
 ```{r}
 ### FIGURE 2B: P50 by predawn 
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -460,7 +463,7 @@ for (sp in names(species_list)) {
 Fig2B <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = predawn_MPa_combined, y = P50_combined, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = predawn, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -500,6 +503,8 @@ Fig2B
 ## canopy closure
 ```{r}
 ### FIGURE 2C: P50_combined by canopy closure 
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -562,11 +567,11 @@ for (sp in names(species_list)) {
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
 
-### Plot
+### FIGURE 2C: P50 by canopy closure
 Fig2C <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = canopy_closure, y = P50_combined, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -601,7 +606,8 @@ Fig2C
 
 ## elevation
 ```{r}
-# ---- FIGURE 2D: P50_combined by elevation ----
+### FIGURE 2D: P50 by elevation
+## plotting model fit trend lines and raw data points
 all_preds_elev_P50 <- data.frame()
 model_summaries_elev_P50 <- data.frame()
 
@@ -650,10 +656,11 @@ for (sp in names(species_list_elev)) {
   all_preds_elev_P50 <- dplyr::bind_rows(all_preds_elev_P50, newdata)
 }
 
+### FIGURE 2D: P50 by elevation
 Fig2D <- ggplot() +
   geom_point(data = trait_data1 %>% filter(species %in% names(species_list_elev)),
              aes(x = elevation_ft, y = P50_combined, color = species),
-             alpha = 0.2, size = 1.5, na.rm = TRUE) +
+             alpha = 0.2, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_elev_P50,
             aes(x = elevation, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -686,8 +693,8 @@ grid.arrange(Fig2A, Fig2B, Fig2C, Fig2D, ncol=2, nrow=2)
 ## diameter
 ```{r}
 
-### FIGURE 3A: HSM_predawn_P50_mean
-## plotting model fit
+### FIGURE 3A: HSM_predawn_P50_mean by diameter
+## plotting model fit trend lines and raw data points
 
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -740,11 +747,11 @@ for (sp in names(species_list)) {
 
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
-
+### FIGURE 3A: HSM_predawn_P50_mean by diameter
 Fig3A <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = diameter_complete, y = HSM_predawn_P50_mean, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = diameter_cm, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -771,7 +778,9 @@ Fig3A <- ggplot() +
   )
 Fig3A
 
-### FIGURE 3B: HSM_midday_P50_mean
+### FIGURE 3B: HSM_midday_P50_mean by diameter 
+## plotting model fit 
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -824,11 +833,11 @@ for (sp in names(species_list)) {
 
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
-
+### FIGURE 3B: HSM_midday_P50 by diameter
 Fig3B <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = diameter_complete, y = HSM_midday_P50_mean, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = diameter_cm, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -868,6 +877,8 @@ grid.arrange(Fig3A, Fig3B, nrow=1, ncol = 2)
 ## canopy closure
 ```{r}
 ### FIGURE 3C: HSM_predawn_P50 by canopy closure
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -930,11 +941,11 @@ for (sp in names(species_list)) {
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
 
-### Plot
+### FIGURE 3C: HSM_predawn_P50_mean by canopy closure 
 Fig3C <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = canopy_closure, y = HSM_predawn_P50_mean, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -962,6 +973,7 @@ Fig3C <- ggplot() +
 Fig3C
 
 ### FIGURE 3D: HSM_midday_P50 by canopy closure
+## plotting model fit 
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1024,11 +1036,11 @@ for (sp in names(species_list)) {
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
 
-### Plot
+# FIGURE 3D: HSM_midday_P50 by canopy closure
 Fig3D <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = canopy_closure, y = HSM_midday_P50_mean, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1058,7 +1070,9 @@ Fig3D
 
 ##elevation
 ```{r}
-# ---- FIGURE 3E: HSM_predawn_P50_mean by elevation ----
+### FIGURE 3E: HSM_predawn_P50_mean by elevation
+## plotting model fit trend lines and raw data points
+
 all_preds_elev_HSM <- data.frame()
 model_summaries_elev_HSM <- data.frame()
 
@@ -1107,11 +1121,11 @@ for (sp in names(species_list_elev)) {
   all_preds_elev_HSM <- dplyr::bind_rows(all_preds_elev_HSM, newdata)
 }
 
-# Plot Figure 3E
+### FIGURE 3E: HSM_predawn_P50_mean by elevation 
 Fig3E <- ggplot() +
   geom_point(data = trait_data1 %>% dplyr::filter(species %in% names(species_list_elev)),
              aes(x = elevation_ft, y = HSM_predawn_P50_mean, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_elev_HSM,
             aes(x = elevation, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1138,7 +1152,8 @@ Fig3E <- ggplot() +
   )
 Fig3E
 
-# ---- FIGURE 3F: HSM_midday_P50_mean by elevation ----
+### FIGURE 3F: HSM_midday_P50_mean by elevation 
+## plotting model fit 
 all_preds_elev_HSM <- data.frame()
 model_summaries_elev_HSM <- data.frame()
 
@@ -1187,11 +1202,11 @@ for (sp in names(species_list_elev)) {
   all_preds_elev_HSM <- dplyr::bind_rows(all_preds_elev_HSM, newdata)
 }
 
-# Plot Figure 3F
+### FIGURE 3F: HSM_midday_P50_mean by elevation 
 Fig3F <- ggplot() +
   geom_point(data = trait_data1 %>% dplyr::filter(species %in% names(species_list_elev)),
              aes(x = elevation_ft, y = HSM_midday_P50_mean, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_elev_HSM,
             aes(x = elevation, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1222,6 +1237,8 @@ Fig3F
 ## predawn
 ```{r}
 ### FIGURE 3G: HSM by predawn 
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1282,7 +1299,7 @@ for (sp in names(species_list)) {
 Fig3G <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = predawn_MPa_combined, y = HSM_midday_P50_mean, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = predawn, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1322,9 +1339,8 @@ grid.arrange(Fig3A, Fig3B, Fig3C, Fig3D, Fig3E, Fig3F, blank_plot, Fig3G, ncol =
 # Figure 4 - growth 
 ## diameter
 ```{r}
-### Figure 4A: Internode length by diameter, holding predawn, canopy closure, and elevation constant
-
-## plotting model fit
+### Figure 4A: Internode length by diameter
+## plotting model fit trend lines and raw data points
 
 all_preds <- data.frame()
 model_summaries <- data.frame()
@@ -1388,11 +1404,11 @@ for (sp in names(species_list)) {
   all_preds <- bind_rows(all_preds, newdata)
 }
 
-### Figure 4A
+### FIGURE 4A: Internode length by diameter 
 Fig4A <- ggplot() +
   geom_point(data = bind_rows(species_list),
              aes(x = diameter_complete, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = diameter_complete, y = pred, color = species, linetype = signif,
       alpha = signif),
@@ -1423,6 +1439,8 @@ Fig4A
 ## predawn
 ```{r}
 ### FIGURE 4B: Internode length by predawn water potential
+## plotting model fit trend lines and raw data points 
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1476,11 +1494,11 @@ for (sp in names(species_list)) {
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
 
-### Plot Figure 4B
+### FIGURE 4B: Internode length by predawn 
 Fig4B <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = predawn_MPa_combined, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = predawn, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1514,6 +1532,8 @@ Fig4B
 ## HSM
 ```{r}
 ### FIGURE 4C: Internode length by HSM_midday_P50_mean
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1570,11 +1590,11 @@ for (sp in names(species_list)) {
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
 
-### Plot Figure 4C
+### FIGURE 4C: Internode length by HSM_midday_P50_mean 
 Fig4C <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = HSM_midday_P50_mean, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = HSM_midday_P50_mean, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1604,7 +1624,9 @@ Fig4C
 
 ##P50
 ```{r}
-# Figure 4D
+### FIGURE 4D: Internode length by P50
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1666,7 +1688,7 @@ for (sp in names(species_list)) {
 Fig4D <- ggplot() +
   geom_point(data = bind_rows(species_list), 
              aes(x = P50_combined, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = P50_raw, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1695,9 +1717,11 @@ Fig4D <- ggplot() +
   )
 Fig4D
 ```
-
+##canopy closure
 ```{r}
 ### FIGURE 4E: Internode length by canopy closure 
+## plotting model fit 
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1758,10 +1782,11 @@ for (sp in names(species_list)) {
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
 
+### FIGURE 4E: Internode length by canopy closure
 Fig4E <- ggplot() +
   geom_point(data = bind_rows(species_list),
              aes(x = canopy_closure, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = canopy, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1793,6 +1818,8 @@ Fig4E
 ## elevation
 ```{r}
 ### FIGURE 4F: Internode length by elevation
+## plotting model fit trend lines and raw data points
+
 all_preds <- data.frame()
 model_summaries <- data.frame()
 
@@ -1836,11 +1863,11 @@ for (sp in names(species_list_elev)) {
   all_preds <- dplyr::bind_rows(all_preds, newdata)
 }
 
-### FIGURE 4F plot
+### FIGURE 4F: Internode length by elevation 
 Fig4F <- ggplot() +
   geom_point(data = bind_rows(species_list_elev),
              aes(x = elevation_ft, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds,
             aes(x = elev, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1874,7 +1901,7 @@ grid.arrange(Fig4A, Fig4B, Fig4C, Fig4D, Fig4E, Fig4F, ncol = 2, nrow =3)
 # Supplemental Figures
 ## water potentials
 ```{r}
-### FIGURE S1A: Predawn by elevation (model-based)
+### FIGURE S1A: Predawn by elevation
 ## plotting model fit
 
 all_preds       <- data.frame()
@@ -2491,70 +2518,89 @@ grid.arrange(S1A, S1B, S1C, S1D, S1E, S1F, nrow = 3, ncol = 2)
 ### WP x diameter
 ```{r}
 ### FIGURE 1A: Predawn WP by size
+## plotting model fit trend lines and partial residuals data points
+
 all_preds <- data.frame()
 all_partial <- data.frame()
 model_summaries <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
+  
+  # Filter to complete cases
   variables <- c("predawn_MPa_combined", "diameter_complete_scaled",
                  "canopy_closure_scaled")
   if (sp != "ABMA") variables <- c(variables, "elevation_ft_scaled")
   df_cc <- df[complete.cases(df[, variables]), ]
   
+  # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled +
-                  canopy_closure_scaled + (1|plot) + (1|wp_year), data = df_cc)
+    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df_cc)
   } else {
-    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled +
-                  canopy_closure_scaled + elevation_ft_scaled +
-                  (1|plot) + (1|wp_year), data = df_cc)
+    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df_cc)
   }
-
+  
+  # Extract fixed-effect p-value for diameter
   summ <- summary(mod)$coefficients
-  diam_p  <- summ["diameter_complete_scaled", "Pr(>|t|)"]
-  signif_label <- case_when(
+  diam_p <- summ["diameter_complete_scaled", "Pr(>|t|)"]
+  signif_label <- dplyr::case_when(
     diam_p < 0.05 ~ "Significant",
     diam_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-  model_summaries <- bind_rows(model_summaries,
-    data.frame(species = sp, p_value = diam_p, signif = signif_label))
-
+  
+  model_summaries <- dplyr::bind_rows(model_summaries,
+                                      data.frame(species = sp,
+                                                 p_value = diam_p,
+                                                 signif = signif_label))
+  
+  # Compute mean and SD for scaling diameter
   mean_d <- mean(df_cc$diameter_complete, na.rm = TRUE)
-  sd_d   <- sd(df_cc$diameter_complete,   na.rm = TRUE)
-
+  sd_d   <- sd(df_cc$diameter_complete, na.rm = TRUE)
+  
+  # Sequence of diameters
   diam_seq <- seq(min(df_cc$diameter_complete, na.rm = TRUE),
                   max(df_cc$diameter_complete, na.rm = TRUE),
                   length.out = 100)
-  newdata <- data.frame(
-    diameter_complete_scaled = (diam_seq - mean_d) / sd_d,
-    canopy_closure_scaled    = 0
-  )
-  if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
+  
+  # Prediction data
+  if (sp == "ABMA") {
+    newdata <- data.frame(
+      diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
+      canopy_closure_scaled = 0
+    )
+  } else {
+    newdata <- data.frame(
+      diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
+      canopy_closure_scaled = 0,
+      elevation_ft_scaled = 0
+    )
+  }
+  
   newdata$diameter_cm <- diam_seq
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif <- signif_label
-  all_preds <- bind_rows(all_preds, newdata)
-
+  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  
   # Partial residuals
-  beta_diam <- fixef(mod)["diameter_complete_scaled"]
+  beta_diam      <- fixef(mod)["diameter_complete_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
   df_cc$partial_resid <- beta_intercept +
                          beta_diam * df_cc$diameter_complete_scaled +
                          residuals(mod)
-  df_cc$diameter_cm <- df_cc$diameter_complete  # use raw cm directly
-  df_cc$species <- sp
-  df_cc$signif  <- signif_label
-  all_partial <- bind_rows(all_partial, df_cc)
+  df_cc$diameter_cm <- df_cc$diameter_complete
+  df_cc$species     <- sp
+  df_cc$signif      <- signif_label
+  all_partial <- dplyr::bind_rows(all_partial, df_cc)
 }
+
 
 S1A <- ggplot() +
   geom_point(
     data  = all_partial,
     aes(x = diameter_cm, y = -partial_resid, color = species),
-    alpha = 0.2, size = 1.8, na.rm = TRUE
+    alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
@@ -2586,69 +2632,88 @@ S1A <- ggplot() +
 S1A
 
 ### FIGURE 1B: Midday WP by size
+## plotting model fit trend lines and partial residuals data points
+
 all_preds_mid       <- data.frame()
 all_partial_mid     <- data.frame()
 model_summaries_mid <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
+  
+  # Filter to complete cases
   variables <- c("midday_MPa_combined", "diameter_complete_scaled",
                  "canopy_closure_scaled")
   if (sp != "ABMA") variables <- c(variables, "elevation_ft_scaled")
   df_cc <- df[complete.cases(df[, variables]), ]
+  
+  # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled +
-                  canopy_closure_scaled + (1|plot) + (1|wp_year), data = df_cc)
+    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + (1|plot) + (1|wp_year), data = df_cc)
   } else {
-    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled +
-                  canopy_closure_scaled + elevation_ft_scaled +
-                  (1|plot) + (1|wp_year), data = df_cc)
+    mod <- lmer(midday_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df_cc)
   }
-
-  summ         <- summary(mod)$coefficients
-  diam_p       <- summ["diameter_complete_scaled", "Pr(>|t|)"]
-  signif_label <- case_when(
+  
+  # Extract fixed-effect p-value for diameter
+  summ <- summary(mod)$coefficients
+  diam_p <- summ["diameter_complete_scaled", "Pr(>|t|)"]
+  signif_label <- dplyr::case_when(
     diam_p < 0.05 ~ "Significant",
     diam_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-  model_summaries_mid <- bind_rows(model_summaries_mid,
-    data.frame(species = sp, p_value = diam_p, signif = signif_label))
-
+  
+  model_summaries_mid <- dplyr::bind_rows(model_summaries_mid,
+                                          data.frame(species = sp,
+                                                     p_value = diam_p,
+                                                     signif = signif_label))
+  
+  # Compute mean and SD for scaling diameter
   mean_d <- mean(df_cc$diameter_complete, na.rm = TRUE)
-  sd_d   <- sd(df_cc$diameter_complete,   na.rm = TRUE)
-
+  sd_d   <- sd(df_cc$diameter_complete, na.rm = TRUE)
+  
+  # Sequence of diameters
   diam_seq <- seq(min(df_cc$diameter_complete, na.rm = TRUE),
                   max(df_cc$diameter_complete, na.rm = TRUE),
                   length.out = 100)
-  newdata <- data.frame(
-    diameter_complete_scaled = (diam_seq - mean_d) / sd_d,
-    canopy_closure_scaled    = 0
-  )
-  if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
+  
+  # Prediction data
+  if (sp == "ABMA") {
+    newdata <- data.frame(
+      diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
+      canopy_closure_scaled = 0
+    )
+  } else {
+    newdata <- data.frame(
+      diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
+      canopy_closure_scaled = 0,
+      elevation_ft_scaled = 0
+    )
+  }
+  
   newdata$diameter_cm <- diam_seq
-  newdata$pred        <- predict(mod, newdata, re.form = NA)
-  newdata$species     <- sp
-  newdata$signif      <- signif_label
-  all_preds_mid <- bind_rows(all_preds_mid, newdata)
-
+  newdata$pred <- predict(mod, newdata, re.form = NA)
+  newdata$species <- sp
+  newdata$signif <- signif_label
+  all_preds_mid <- dplyr::bind_rows(all_preds_mid, newdata)
+  
   # Partial residuals
   beta_diam      <- fixef(mod)["diameter_complete_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
   df_cc$partial_resid <- beta_intercept +
                          beta_diam * df_cc$diameter_complete_scaled +
                          residuals(mod)
-  df_cc$diameter_cm <- df_cc$diameter_complete  # use raw cm directly
-  df_cc$species <- sp
-  df_cc$signif  <- signif_label
-  all_partial_mid <- bind_rows(all_partial_mid, df_cc)
+  df_cc$diameter_cm <- df_cc$diameter_complete
+  df_cc$species     <- sp
+  df_cc$signif      <- signif_label
+  all_partial_mid <- dplyr::bind_rows(all_partial_mid, df_cc)
 }
 
 S2B <- ggplot() +
   geom_point(
     data  = all_partial_mid,
     aes(x = diameter_cm, y = -partial_resid, color = species),
-    alpha = 0.2, size = 1.8, na.rm = TRUE
+    alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
@@ -2702,6 +2767,8 @@ cor.test(all_partial$partial_resid, all_partial$elevation_ft_scaled)
 ### P50
 ```{r}
 ### FIGURE 3A: P50 by diameter
+## plotting model fit trend lines and partial residuals data points
+
 all_preds_3A   <- data.frame()
 all_partial_3A <- data.frame()
 model_summaries_3A <- data.frame()
@@ -2763,6 +2830,8 @@ for (sp in names(species_list)) {
 }
 
 ### FIGURE 3B: P50 by predawn
+## plotting model fit trend lines and partial residuals data points
+
 all_preds_3B   <- data.frame()
 all_partial_3B <- data.frame()
 model_summaries_3B <- data.frame()
@@ -2824,6 +2893,8 @@ for (sp in names(species_list)) {
 }
 
 ### FIGURE 3C: P50 by canopy closure
+## plotting model fit trend lines and partial residuals data points
+
 all_preds_3C   <- data.frame()
 all_partial_3C <- data.frame()
 model_summaries_3C <- data.frame()
@@ -2885,6 +2956,8 @@ for (sp in names(species_list)) {
 }
 
 ### FIGURE 3D: P50 by elevation
+## plotting model fit trend lines and partial residuals data points
+
 all_preds_3D   <- data.frame()
 all_partial_3D <- data.frame()
 model_summaries_3D <- data.frame()
@@ -2943,7 +3016,7 @@ for (sp in names(species_list_elev)) {
 S3A <- ggplot() +
   geom_point(data = all_partial_3A,
              aes(x = x_var, y = -partial_resid, color = species),
-             alpha = 0.2, size = 1.5, na.rm = TRUE) +
+             alpha = 0.15, size = 1.5, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(data = all_preds_3A,
@@ -2968,7 +3041,7 @@ S3A <- ggplot() +
 S3B <- ggplot() +
   geom_point(data = all_partial_3B,
              aes(x = -x_var, y = -partial_resid, color = species),
-             alpha = 0.2, size = 1.5, na.rm = TRUE) +
+             alpha = 0.15, size = 1.5, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(data = all_preds_3B,
@@ -2993,7 +3066,7 @@ S3B <- ggplot() +
 S3C <- ggplot() +
   geom_point(data = all_partial_3C,
              aes(x = x_var, y = -partial_resid, color = species),
-             alpha = 0.2, size = 1.5, na.rm = TRUE) +
+             alpha = 0.15, size = 1.5, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(data = all_preds_3C,
@@ -3018,7 +3091,7 @@ S3C <- ggplot() +
 S3D <- ggplot() +
   geom_point(data = all_partial_3D,
              aes(x = x_var, y = -partial_resid, color = species),
-             alpha = 0.2, size = 1.5, na.rm = TRUE) +
+             alpha = 0.15, size = 1.5, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(data = all_preds_3D,
@@ -3056,6 +3129,9 @@ grid.arrange(S3A, S3B, S3C, S3D, ncol = 2, nrow = 2)
 
 ### HSM
 ```{r}
+### FIGURE 4A: HSM (predawn) by diameter
+## plotting model fit trend lines and partial residuals data points
+
 all_preds_4A <- data.frame()
 all_partial_4A <- data.frame()
 model_summaries_4A <- data.frame()
@@ -3142,7 +3218,7 @@ S4A <- ggplot() +
   geom_point(
     data = all_partial_4A,
     aes(x = diameter_cm, y = partial_resid, color = species),
-    alpha = 0.2, size = 2
+    alpha = 0.15, size = 2
   ) +
   geom_line(
     data = all_preds_4A,
@@ -3167,6 +3243,9 @@ S4A <- ggplot() +
     legend.position  = "none"
   )
 S4A
+
+### FIGURE 4B: HSM (midday) by diameter
+## plotting model fit trend lines and partial residuals data points
 
 all_preds_4B <- data.frame()
 all_partial_4B <- data.frame()
@@ -3244,7 +3323,7 @@ for (sp in names(species_list)) {
 S4B <- ggplot() +
   geom_point(data = all_partial_4B,
              aes(x = diameter_cm, y = partial_resid, color = species),
-             alpha = 0.2, size = 2) +
+             alpha = 0.15, size = 2) +
   geom_line(data = all_preds_4B,
             aes(x = diameter_cm, y = pred,
                 color = species, linetype = signif),
@@ -3263,6 +3342,9 @@ S4B <- ggplot() +
   )
 
 S4B
+
+### FIGURE 4C: HSM (predawn) by canopy closure
+## plotting model fit trend lines and partial residuals data points
 
 all_preds_4C <- data.frame()
 all_partial_4C <- data.frame()
@@ -3339,7 +3421,7 @@ for (sp in names(species_list)) {
 S4C <- ggplot() +
   geom_point(data = all_partial_4C,
              aes(x = canopy_closure_raw, y = partial_resid, color = species),
-             alpha = 0.2, size = 2) +
+             alpha = 0.15, size = 2) +
   geom_line(data = all_preds_4C,
             aes(x = canopy_closure, y = pred,
                 color = species, linetype = signif),
@@ -3358,6 +3440,8 @@ S4C <- ggplot() +
   )
 S4C
 
+### FIGURE 4D: HSM (midday) by canopy closure
+## plotting model fit trend lines and partial residuals data points
 
 all_preds_4D <- data.frame()
 all_partial_4D <- data.frame()
@@ -3434,7 +3518,7 @@ for (sp in names(species_list)) {
 S4D <- ggplot() +
   geom_point(data = all_partial_4D,
              aes(x = canopy_closure_raw, y = partial_resid, color = species),
-             alpha = 0.2, size = 2) +
+             alpha = 0.15, size = 2) +
   geom_line(data = all_preds_4D,
             aes(x = canopy_closure, y = pred,
                 color = species, linetype = signif),
@@ -3452,6 +3536,9 @@ S4D <- ggplot() +
     legend.position  = "none"
   )
 S4D
+
+### FIGURE 4E: HSM (predawn) by elevation
+## plotting model fit trend lines and partial residuals data points
 
 all_preds_4E <- data.frame()
 all_partial_4E <- data.frame()
@@ -3512,7 +3599,7 @@ for (sp in names(species_list_elev)) {
 
   all_preds_4E <- dplyr::bind_rows(all_preds_4E, newdata)
 
-  # ── partial residuals (S1A formula) ──────────────────────
+  # ── partial residuals  ──────────────────────
   beta <- fixef(mod)["elevation_ft_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
 
@@ -3531,7 +3618,7 @@ S4E <- ggplot() +
   geom_point(
     data = all_partial_4E,
     aes(x = elevation_raw, y = partial_resid, color = species),
-    alpha = 0.2, size = 2, na.rm = TRUE
+    alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   geom_line(
     data = all_preds_4E,
@@ -3558,6 +3645,9 @@ S4E <- ggplot() +
     legend.position  = "none"
   )
 S4E
+
+### FIGURE 4F: HSM (midday) by elevation
+## plotting model fit trend lines and partial residuals data points
 
 all_preds_4F <- data.frame()
 all_partial_4F <- data.frame()
@@ -3637,7 +3727,7 @@ S4F <- ggplot() +
   geom_point(
     data = all_partial_4F,
     aes(x = elevation_raw, y = partial_resid, color = species),
-    alpha = 0.2, size = 2, na.rm = TRUE
+    alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   geom_line(
     data = all_preds_4F,
@@ -3664,6 +3754,9 @@ S4F <- ggplot() +
     legend.position  = "none"
   )
 S4F
+
+### FIGURE 4G: HSM (midday) by canopy closure
+## plotting model fit trend lines and partial residuals data points
 
 all_preds_4G <- data.frame()
 all_partial_4G <- data.frame()
@@ -3754,7 +3847,7 @@ S4G <- ggplot() +
   geom_point(
     data = all_partial_4G,
     aes(x = -predawn_raw, y = partial_resid, color = species),
-    alpha = 0.2, size = 2, na.rm = TRUE
+    alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   geom_line(
     data = all_preds_4G,
@@ -3792,22 +3885,19 @@ grid.arrange(S4A, S4B, S4C, S4D, S4E, S4F, blank_plot, S4G, ncol =2, nrow = 4)
 ```
 ### growth
 ```{r}
-# ── Fig5A: Internode length ~ diameter ───────────────────────────────────────
-all_preds_5A <- data.frame()
+### FIGURE 5A: Internode length by diameter
+## plotting model fit trend lines and partial residuals data points
+
+all_preds_5A   <- data.frame()
 all_partial_5A <- data.frame()
 model_summaries_5A <- data.frame()
 
 for (sp in names(species_list)) {
-
   df <- species_list[[sp]]
 
-  vars <- c("internode_length_1_2",
-            "diameter_complete_scaled",
-            "predawn_scaled",
-            "canopy_closure_scaled")
-
+  vars <- c("internode_length_1_2", "diameter_complete_scaled",
+            "predawn_scaled", "canopy_closure_scaled")
   if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
-
   df_cc <- df[complete.cases(df[, vars]), ]
 
   mod <- if (sp == "ABMA") {
@@ -3817,103 +3907,89 @@ for (sp in names(species_list)) {
   } else {
     lmer(internode_length_1_2 ~ diameter_complete_scaled +
            predawn_scaled + canopy_closure_scaled +
-           elevation_ft_scaled +
-           (1|plot), data = df_cc)
+           elevation_ft_scaled + (1|plot), data = df_cc)
   }
 
-  # ── significance (FIXED) ─────────────────────────────
-  summ <- summary(mod)$coefficients
+  summ   <- summary(mod)$coefficients
   diam_p <- summ["diameter_complete_scaled", "Pr(>|t|)"]
-
   signif_label <- dplyr::case_when(
     diam_p < 0.05 ~ "Significant",
     diam_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-
   model_summaries_5A <- dplyr::bind_rows(
     model_summaries_5A,
     data.frame(species = sp, p_value = diam_p, signif = signif_label)
   )
 
-  # ── predictions ─────────────────────────────
   mean_d <- mean(df_cc$diameter_complete, na.rm = TRUE)
   sd_d   <- sd(df_cc$diameter_complete, na.rm = TRUE)
-
-  diam_seq <- seq(min(df_cc$diameter_complete),
-                  max(df_cc$diameter_complete),
-                  length.out = 100)
+  diam_seq <- seq(min(df_cc$diameter_complete), max(df_cc$diameter_complete), length.out = 100)
 
   newdata <- data.frame(
     diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
     predawn_scaled = 0,
     canopy_closure_scaled = 0
   )
-
   if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
-
   newdata$diameter_cm <- diam_seq
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
-  newdata$signif <- signif_label   # IMPORTANT FIX
-
+  newdata$signif <- signif_label
   all_preds_5A <- dplyr::bind_rows(all_preds_5A, newdata)
 
-  # ── partial residuals ─────────────────────────────
-  beta <- fixef(mod)["diameter_complete_scaled"]
-  intercept <- fixef(mod)["(Intercept)"]
-
-  df_cc$partial_resid <- intercept +
-                         beta * df_cc$diameter_complete_scaled +
+  beta_diam      <- fixef(mod)["diameter_complete_scaled"]
+  beta_intercept <- fixef(mod)["(Intercept)"]
+  df_cc$partial_resid <- beta_intercept +
+                         beta_diam * df_cc$diameter_complete_scaled +
                          residuals(mod)
-
   df_cc$diameter_cm <- df_cc$diameter_complete
   df_cc$species <- sp
-  df_cc$signif <- signif_label     # IMPORTANT FIX
-
+  df_cc$signif  <- signif_label
   all_partial_5A <- dplyr::bind_rows(all_partial_5A, df_cc)
 }
 
 S5A <- ggplot() +
   geom_point(data = all_partial_5A,
              aes(x = diameter_cm, y = partial_resid, color = species),
-             alpha = 0.2, size = 2) +
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_5A,
-            aes(x = diameter_cm, y = pred,
-                color = species, linetype = signif),
-            linewidth = 1.2) +
+            aes(x = diameter_cm, y = pred, color = species, linetype = signif),
+            linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
-  scale_linetype_manual(values = c(
-    "Significant" = "solid",
-    "Marginal" = "dashed",
-    "Not significant" = "dotted"
-  )) +
-  labs(x = "Diameter (cm)",
-       y = "Internode length") +
-  theme(panel.background = element_rect(fill = "white"),
-        panel.border = element_rect(color = "gray50", fill = NA, linewidth = 1),
-        panel.grid = element_blank(),
-        axis.line = element_blank(),
-        legend.position = "none")
-S5A
+  scale_linetype_manual(values = c("Significant" = "solid", "Marginal" = "dashed", "Not significant" = "dotted")) +
+  labs(x = "Basal diameter (cm)", y = "Internode length (cm)") +
+  theme(panel.background = element_rect(fill = "white", color = NA),
+        panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
+        panel.grid = element_blank(), axis.line = element_blank(),
+        plot.background  = element_rect(fill = "white", color = NA),
+        legend.position  = "none")
 
-# ── Fig5B: Internode length ~ predawn ────────────────────────────────────────
-all_preds_5B <- data.frame()
+
+### FIGURE 5B: Internode length by predawn 
+## plotting model fit trend lines and partial residuals data points
+all_preds_5B   <- data.frame()
+all_partial_5B <- data.frame()
 model_summaries_5B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
-  if (sp == "ABMA") {
-    mod <- lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled +
-                  diameter_complete_scaled + (1|plot), data = df)
+  vars <- c("internode_length_1_2", "predawn_scaled",
+            "canopy_closure_scaled", "diameter_complete_scaled")
+  if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
+  df_cc <- df[complete.cases(df[, vars]), ]
+
+  mod <- if (sp == "ABMA") {
+    lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled +
+           diameter_complete_scaled + (1|plot), data = df_cc)
   } else {
-    mod <- lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled +
-                  elevation_ft_scaled + diameter_complete_scaled + (1|plot), data = df)
+    lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled +
+           elevation_ft_scaled + diameter_complete_scaled + (1|plot), data = df_cc)
   }
 
-  summ <- summary(mod)$coefficients
-  pd_p <- summ["predawn_scaled", "Pr(>|t|)"]
+  summ  <- summary(mod)$coefficients
+  pd_p  <- summ["predawn_scaled", "Pr(>|t|)"]
   signif_label <- dplyr::case_when(
     pd_p < 0.05 ~ "Significant",
     pd_p < 0.1  ~ "Marginal",
@@ -3922,58 +3998,68 @@ for (sp in names(species_list)) {
   model_summaries_5B <- dplyr::bind_rows(model_summaries_5B,
                                          data.frame(species = sp, p_value = pd_p, signif = signif_label))
 
-  mean_pd <- mean(df$predawn_MPa_combined, na.rm = TRUE)
-  sd_pd   <- sd(df$predawn_MPa_combined,   na.rm = TRUE)
-  pd_seq  <- seq(min(df$predawn_MPa_combined, na.rm = TRUE),
-                 max(df$predawn_MPa_combined, na.rm = TRUE), length.out = 100)
+  mean_pd <- mean(df_cc$predawn_MPa_combined, na.rm = TRUE)
+  sd_pd   <- sd(df_cc$predawn_MPa_combined, na.rm = TRUE)
+  pd_seq  <- seq(min(df_cc$predawn_MPa_combined, na.rm = TRUE),
+                 max(df_cc$predawn_MPa_combined, na.rm = TRUE), length.out = 100)
 
-  if (sp == "ABMA") {
-    newdata <- data.frame(predawn_scaled = (pd_seq - mean_pd)/sd_pd,
-                          canopy_closure_scaled = 0, diameter_complete_scaled = 0)
-  } else {
-    newdata <- data.frame(predawn_scaled = (pd_seq - mean_pd)/sd_pd,
-                          canopy_closure_scaled = 0, elevation_ft_scaled = 0, diameter_complete_scaled = 0)
-  }
-
+  newdata <- data.frame(predawn_scaled = (pd_seq - mean_pd)/sd_pd,
+                        canopy_closure_scaled = 0, diameter_complete_scaled = 0)
+  if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
   newdata$predawn <- pd_seq
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
   all_preds_5B <- dplyr::bind_rows(all_preds_5B, newdata)
+
+  beta_pd        <- fixef(mod)["predawn_scaled"]
+  beta_intercept <- fixef(mod)["(Intercept)"]
+  df_cc$partial_resid <- beta_intercept +
+                         beta_pd * df_cc$predawn_scaled +
+                         residuals(mod)
+  df_cc$predawn  <- df_cc$predawn_MPa_combined
+  df_cc$species  <- sp
+  df_cc$signif   <- signif_label
+  all_partial_5B <- dplyr::bind_rows(all_partial_5B, df_cc)
 }
 
 S5B <- ggplot() +
-  geom_point(data = trait_data1,
-             aes(x = predawn_MPa_combined, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+  geom_point(data = all_partial_5B,
+             aes(x = predawn, y = partial_resid, color = species),
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_5B,
             aes(x = predawn, y = pred, color = species, linetype = signif),
-            size = 1.2, na.rm = TRUE) +
+            linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   scale_linetype_manual(values = c("Significant" = "solid", "Marginal" = "dashed", "Not significant" = "dotted")) +
-  scale_alpha_manual(values  = c("Significant" = 1.0,     "Marginal" = 0.7,      "Not significant" = 0.35)) +
   scale_x_reverse(labels = function(x) paste0("\u2212", abs(x))) +
   labs(x = expression(Psi[predawn]~"(MPa)"), y = "Internode length (cm)") +
   theme(panel.background = element_rect(fill = "white", color = NA),
-        panel.border     = element_rect(color = "gray50", fill = NA, size = 1),
+        panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
         panel.grid = element_blank(), axis.line = element_blank(),
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
 
 # ── Fig5C: Internode length ~ HSM_midday ─────────────────────────────────────
-all_preds_5C <- data.frame()
+all_preds_5C   <- data.frame()
+all_partial_5C <- data.frame()
 model_summaries_5C <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
-  if (sp == "ABMA") {
-    mod <- lmer(internode_length_1_2 ~ HSM_midday_P50_mean_scaled + predawn_scaled +
-                  canopy_closure_scaled + diameter_complete_scaled + (1|plot), data = df)
+  vars <- c("internode_length_1_2", "HSM_midday_P50_mean_scaled",
+            "predawn_scaled", "canopy_closure_scaled", "diameter_complete_scaled")
+  if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
+  df_cc <- df[complete.cases(df[, vars]), ]
+
+  mod <- if (sp == "ABMA") {
+    lmer(internode_length_1_2 ~ HSM_midday_P50_mean_scaled + predawn_scaled +
+           canopy_closure_scaled + diameter_complete_scaled + (1|plot), data = df_cc)
   } else {
-    mod <- lmer(internode_length_1_2 ~ HSM_midday_P50_mean_scaled + predawn_scaled +
-                  canopy_closure_scaled + elevation_ft_scaled + diameter_complete_scaled + (1|plot), data = df)
+    lmer(internode_length_1_2 ~ HSM_midday_P50_mean_scaled + predawn_scaled +
+           canopy_closure_scaled + elevation_ft_scaled + diameter_complete_scaled + (1|plot), data = df_cc)
   }
 
   summ  <- summary(mod)$coefficients
@@ -3986,58 +4072,67 @@ for (sp in names(species_list)) {
   model_summaries_5C <- dplyr::bind_rows(model_summaries_5C,
                                          data.frame(species = sp, p_value = hsm_p, signif = signif_label))
 
-  mean_hsm <- mean(df$HSM_midday_P50_mean, na.rm = TRUE)
-  sd_hsm   <- sd(df$HSM_midday_P50_mean,   na.rm = TRUE)
-  hsm_seq  <- seq(min(df$HSM_midday_P50_mean, na.rm = TRUE),
-                  max(df$HSM_midday_P50_mean, na.rm = TRUE), length.out = 100)
+  mean_hsm <- mean(df_cc$HSM_midday_P50_mean, na.rm = TRUE)
+  sd_hsm   <- sd(df_cc$HSM_midday_P50_mean, na.rm = TRUE)
+  hsm_seq  <- seq(min(df_cc$HSM_midday_P50_mean, na.rm = TRUE),
+                  max(df_cc$HSM_midday_P50_mean, na.rm = TRUE), length.out = 100)
 
-  if (sp == "ABMA") {
-    newdata <- data.frame(HSM_midday_P50_mean_scaled = (hsm_seq - mean_hsm)/sd_hsm,
-                          predawn_scaled = 0, canopy_closure_scaled = 0, diameter_complete_scaled = 0)
-  } else {
-    newdata <- data.frame(HSM_midday_P50_mean_scaled = (hsm_seq - mean_hsm)/sd_hsm,
-                          predawn_scaled = 0, canopy_closure_scaled = 0,
-                          elevation_ft_scaled = 0, diameter_complete_scaled = 0)
-  }
-
+  newdata <- data.frame(HSM_midday_P50_mean_scaled = (hsm_seq - mean_hsm)/sd_hsm,
+                        predawn_scaled = 0, canopy_closure_scaled = 0, diameter_complete_scaled = 0)
+  if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
   newdata$HSM_midday_P50_mean <- hsm_seq
-  newdata$pred                <- predict(mod, newdata, re.form = NA)
-  newdata$species             <- sp
-  newdata$signif              <- signif_label
+  newdata$pred    <- predict(mod, newdata, re.form = NA)
+  newdata$species <- sp
+  newdata$signif  <- signif_label
   all_preds_5C <- dplyr::bind_rows(all_preds_5C, newdata)
+
+  beta_hsm       <- fixef(mod)["HSM_midday_P50_mean_scaled"]
+  beta_intercept <- fixef(mod)["(Intercept)"]
+  df_cc$partial_resid <- beta_intercept +
+                         beta_hsm * df_cc$HSM_midday_P50_mean_scaled +
+                         residuals(mod)
+  df_cc$HSM_midday_P50_mean <- df_cc$HSM_midday_P50_mean
+  df_cc$species  <- sp
+  df_cc$signif   <- signif_label
+  all_partial_5C <- dplyr::bind_rows(all_partial_5C, df_cc)
 }
 
 S5C <- ggplot() +
-  geom_point(data = trait_data1,
-             aes(x = HSM_midday_P50_mean, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+  geom_point(data = all_partial_5C,
+             aes(x = HSM_midday_P50_mean, y = partial_resid, color = species),
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_5C,
             aes(x = HSM_midday_P50_mean, y = pred, color = species, linetype = signif),
-            size = 1.2, na.rm = TRUE) +
+            linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   scale_linetype_manual(values = c("Significant" = "solid", "Marginal" = "dashed", "Not significant" = "dotted")) +
-  scale_alpha_manual(values  = c("Significant" = 1.0,     "Marginal" = 0.7,      "Not significant" = 0.35)) +
   labs(x = expression(HSM[midday]~"(MPa)"), y = "Internode length (cm)") +
   theme(panel.background = element_rect(fill = "white", color = NA),
-        panel.border     = element_rect(color = "gray50", fill = NA, size = 1),
+        panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
         panel.grid = element_blank(), axis.line = element_blank(),
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
 
 # ── Fig5D: Internode length ~ P50 ────────────────────────────────────────────
-all_preds_5D <- data.frame()
+all_preds_5D   <- data.frame()
+all_partial_5D <- data.frame()
 model_summaries_5D <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
-  if (sp == "ABMA") {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + P50_scaled +
-                  predawn_scaled + canopy_closure_scaled + (1|plot), data = df)
+  vars <- c("internode_length_1_2", "P50_scaled", "diameter_complete_scaled",
+            "predawn_scaled", "canopy_closure_scaled")
+  if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
+  df_cc <- df[complete.cases(df[, vars]), ]
+
+  mod <- if (sp == "ABMA") {
+    lmer(internode_length_1_2 ~ diameter_complete_scaled + P50_scaled +
+           predawn_scaled + canopy_closure_scaled + (1|plot), data = df_cc)
   } else {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + P50_scaled +
-                  predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df)
+    lmer(internode_length_1_2 ~ diameter_complete_scaled + P50_scaled +
+           predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df_cc)
   }
 
   summ  <- summary(mod)$coefficients
@@ -4050,59 +4145,68 @@ for (sp in names(species_list)) {
   model_summaries_5D <- dplyr::bind_rows(model_summaries_5D,
                                          data.frame(species = sp, p_value = p50_p, signif = signif_label))
 
-  mean_P50 <- mean(df$P50_combined, na.rm = TRUE)
-  sd_P50   <- sd(df$P50_combined,   na.rm = TRUE)
-  P50_seq  <- seq(min(df$P50_combined, na.rm = TRUE),
-                  max(df$P50_combined, na.rm = TRUE), length.out = 100)
+  mean_P50 <- mean(df_cc$P50_combined, na.rm = TRUE)
+  sd_P50   <- sd(df_cc$P50_combined, na.rm = TRUE)
+  P50_seq  <- seq(min(df_cc$P50_combined, na.rm = TRUE),
+                  max(df_cc$P50_combined, na.rm = TRUE), length.out = 100)
 
-  if (sp == "ABMA") {
-    newdata <- data.frame(P50_scaled = (P50_seq - mean_P50)/sd_P50,
-                          diameter_complete_scaled = 0, predawn_scaled = 0, canopy_closure_scaled = 0)
-  } else {
-    newdata <- data.frame(P50_scaled = (P50_seq - mean_P50)/sd_P50,
-                          diameter_complete_scaled = 0, predawn_scaled = 0,
-                          canopy_closure_scaled = 0, elevation_ft_scaled = 0)
-  }
-
+  newdata <- data.frame(P50_scaled = (P50_seq - mean_P50)/sd_P50,
+                        diameter_complete_scaled = 0, predawn_scaled = 0, canopy_closure_scaled = 0)
+  if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
   newdata$P50_raw <- P50_seq
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
   all_preds_5D <- dplyr::bind_rows(all_preds_5D, newdata)
+
+  beta_p50       <- fixef(mod)["P50_scaled"]
+  beta_intercept <- fixef(mod)["(Intercept)"]
+  df_cc$partial_resid <- beta_intercept +
+                         beta_p50 * df_cc$P50_scaled +
+                         residuals(mod)
+  df_cc$P50_raw  <- df_cc$P50_combined
+  df_cc$species  <- sp
+  df_cc$signif   <- signif_label
+  all_partial_5D <- dplyr::bind_rows(all_partial_5D, df_cc)
 }
 
 S5D <- ggplot() +
-  geom_point(data = bind_rows(species_list),
-             aes(x = P50_combined, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+  geom_point(data = all_partial_5D,
+             aes(x = P50_raw, y = partial_resid, color = species),
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_5D,
             aes(x = P50_raw, y = pred, color = species, linetype = signif),
-            size = 1.2, na.rm = TRUE) +
+            linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   scale_linetype_manual(values = c("Significant" = "solid", "Marginal" = "dashed", "Not significant" = "dotted")) +
-  scale_alpha_manual(values  = c("Significant" = 1.0,     "Marginal" = 0.7,      "Not significant" = 0.35)) +
   scale_x_reverse(labels = function(x) paste0("\u2212", abs(x))) +
   labs(x = expression(P[50]~"(MPa)"), y = "Internode length (cm)") +
   theme(panel.background = element_rect(fill = "white", color = NA),
-        panel.border     = element_rect(color = "gray50", fill = NA, size = 1),
+        panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
         panel.grid = element_blank(), axis.line = element_blank(),
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
 
-# ── Fig5E: Internode length ~ canopy closure ──────────────────────────────────
-all_preds_5E <- data.frame()
+# ── Fig5E: Internode length ~ canopy closure ─────────────────────────────────
+all_preds_5E   <- data.frame()
+all_partial_5E <- data.frame()
 model_summaries_5E <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
-  if (sp == "ABMA") {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled +
-                  predawn_scaled + (1|plot), data = df)
+  vars <- c("internode_length_1_2", "canopy_closure_scaled",
+            "diameter_complete_scaled", "predawn_scaled")
+  if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
+  df_cc <- df[complete.cases(df[, vars]), ]
+
+  mod <- if (sp == "ABMA") {
+    lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled +
+           predawn_scaled + (1|plot), data = df_cc)
   } else {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled +
-                  predawn_scaled + elevation_ft_scaled + (1|plot), data = df)
+    lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled +
+           predawn_scaled + elevation_ft_scaled + (1|plot), data = df_cc)
   }
 
   summ     <- summary(mod)$coefficients
@@ -4115,53 +4219,62 @@ for (sp in names(species_list)) {
   model_summaries_5E <- dplyr::bind_rows(model_summaries_5E,
                                          data.frame(species = sp, p_value = canopy_p, signif = signif_label))
 
-  mean_canopy <- mean(df$canopy_closure, na.rm = TRUE)
-  sd_canopy   <- sd(df$canopy_closure,   na.rm = TRUE)
-  canopy_seq  <- seq(min(df$canopy_closure, na.rm = TRUE),
-                     max(df$canopy_closure, na.rm = TRUE), length.out = 100)
+  mean_canopy <- mean(df_cc$canopy_closure, na.rm = TRUE)
+  sd_canopy   <- sd(df_cc$canopy_closure, na.rm = TRUE)
+  canopy_seq  <- seq(min(df_cc$canopy_closure, na.rm = TRUE),
+                     max(df_cc$canopy_closure, na.rm = TRUE), length.out = 100)
 
-  if (sp == "ABMA") {
-    newdata <- data.frame(canopy_closure_scaled    = (canopy_seq - mean_canopy)/sd_canopy,
-                          diameter_complete_scaled = 0, predawn_scaled = 0)
-  } else {
-    newdata <- data.frame(canopy_closure_scaled    = (canopy_seq - mean_canopy)/sd_canopy,
-                          diameter_complete_scaled = 0, predawn_scaled = 0, elevation_ft_scaled = 0)
-  }
-
+  newdata <- data.frame(canopy_closure_scaled = (canopy_seq - mean_canopy)/sd_canopy,
+                        diameter_complete_scaled = 0, predawn_scaled = 0)
+  if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
   newdata$canopy  <- canopy_seq
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
   all_preds_5E <- dplyr::bind_rows(all_preds_5E, newdata)
+
+  beta_canopy    <- fixef(mod)["canopy_closure_scaled"]
+  beta_intercept <- fixef(mod)["(Intercept)"]
+  df_cc$partial_resid <- beta_intercept +
+                         beta_canopy * df_cc$canopy_closure_scaled +
+                         residuals(mod)
+  df_cc$canopy   <- df_cc$canopy_closure
+  df_cc$species  <- sp
+  df_cc$signif   <- signif_label
+  all_partial_5E <- dplyr::bind_rows(all_partial_5E, df_cc)
 }
 
 S5E <- ggplot() +
-  geom_point(data = bind_rows(species_list),
-             aes(x = canopy_closure, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+  geom_point(data = all_partial_5E,
+             aes(x = canopy, y = partial_resid, color = species),
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_5E,
             aes(x = canopy, y = pred, color = species, linetype = signif),
-            size = 1.2, na.rm = TRUE) +
+            linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   scale_linetype_manual(values = c("Significant" = "solid", "Marginal" = "dashed", "Not significant" = "dotted")) +
-  scale_alpha_manual(values  = c("Significant" = 1.0,     "Marginal" = 0.7,      "Not significant" = 0.35)) +
   labs(x = "Canopy closure (%)", y = "Internode length (cm)") +
   theme(panel.background = element_rect(fill = "white", color = NA),
-        panel.border     = element_rect(color = "gray50", fill = NA, size = 1),
+        panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
         panel.grid = element_blank(), axis.line = element_blank(),
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
 
 # ── Fig5F: Internode length ~ elevation ──────────────────────────────────────
-all_preds_5F <- data.frame()
+all_preds_5F   <- data.frame()
+all_partial_5F <- data.frame()
 model_summaries_5F <- data.frame()
 
 for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
+  vars <- c("internode_length_1_2", "elevation_ft_scaled",
+            "diameter_complete_scaled", "predawn_scaled", "canopy_closure_scaled")
+  df_cc <- df[complete.cases(df[, vars]), ]
+
   mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled +
-                canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df)
+                canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df_cc)
 
   summ   <- summary(mod)$coefficients
   elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
@@ -4173,36 +4286,44 @@ for (sp in names(species_list_elev)) {
   model_summaries_5F <- dplyr::bind_rows(model_summaries_5F,
                                          data.frame(species = sp, p_value = elev_p, signif = signif_label))
 
-  mean_elev <- mean(df$elevation_ft, na.rm = TRUE)
-  sd_elev   <- sd(df$elevation_ft,   na.rm = TRUE)
-  elev_seq  <- seq(min(df$elevation_ft, na.rm = TRUE),
-                   max(df$elevation_ft, na.rm = TRUE), length.out = 100)
+  mean_elev <- mean(df_cc$elevation_ft, na.rm = TRUE)
+  sd_elev   <- sd(df_cc$elevation_ft, na.rm = TRUE)
+  elev_seq  <- seq(min(df_cc$elevation_ft, na.rm = TRUE),
+                   max(df_cc$elevation_ft, na.rm = TRUE), length.out = 100)
 
   newdata <- data.frame(elevation_ft_scaled     = (elev_seq - mean_elev)/sd_elev,
                         diameter_complete_scaled = 0,
                         predawn_scaled           = 0,
                         canopy_closure_scaled    = 0)
-
   newdata$elev    <- elev_seq
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
   all_preds_5F <- dplyr::bind_rows(all_preds_5F, newdata)
+
+  beta_elev      <- fixef(mod)["elevation_ft_scaled"]
+  beta_intercept <- fixef(mod)["(Intercept)"]
+  df_cc$partial_resid <- beta_intercept +
+                         beta_elev * df_cc$elevation_ft_scaled +
+                         residuals(mod)
+  df_cc$elev     <- df_cc$elevation_ft
+  df_cc$species  <- sp
+  df_cc$signif   <- signif_label
+  all_partial_5F <- dplyr::bind_rows(all_partial_5F, df_cc)
 }
 
 S5F <- ggplot() +
-  geom_point(data = bind_rows(species_list_elev),
-             aes(x = elevation_ft, y = internode_length_1_2, color = species),
-             alpha = 0.2, size = 2, na.rm = TRUE) +
+  geom_point(data = all_partial_5F,
+             aes(x = elev, y = partial_resid, color = species),
+             alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_5F,
             aes(x = elev, y = pred, color = species, linetype = signif),
-            size = 1.2, na.rm = TRUE) +
+            linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   scale_linetype_manual(values = c("Significant" = "solid", "Marginal" = "dashed", "Not significant" = "dotted")) +
-  scale_alpha_manual(values  = c("Significant" = 1.0,     "Marginal" = 0.7,      "Not significant" = 0.35)) +
   labs(x = "Elevation (ft)", y = "Internode length (cm)") +
   theme(panel.background = element_rect(fill = "white", color = NA),
-        panel.border     = element_rect(color = "gray50", fill = NA, size = 1),
+        panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
         panel.grid = element_blank(), axis.line = element_blank(),
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
@@ -4210,8 +4331,5 @@ S5F <- ggplot() +
 
 # ── Final panel ───────────────────────────────────────────────────────────────
 grid.arrange(S5A, S5B, S5C, S5D, S5E, S5F, ncol = 2, nrow = 3)
-
-
-
 
 ```
