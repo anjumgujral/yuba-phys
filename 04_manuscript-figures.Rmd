@@ -7,14 +7,6 @@ output: html_document
 
 # load packages 
 ```{r}
-install.packages('RColorBrewer')
-install.packages('ggnewscale')
-install.packages('colorspace')
-install.packages('ggplot2')
-install.packages('lmerTest')
-install.packages('dplyr')
-install.packages('gridExtra')
-
 library(RColorBrewer)
 library(ggnewscale)
 library(colorspace)
@@ -691,7 +683,6 @@ grid.arrange(Fig2A, Fig2B, Fig2C, Fig2D, ncol=2, nrow=2)
 #Figure 3 - HSM
 ## diameter
 ```{r}
-
 ### FIGURE 3A: HSM_predawn_P50_mean by diameter
 ## plotting model fit trend lines and raw data points
 
