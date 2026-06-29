@@ -67,6 +67,7 @@ sites_3310 <- project(sites_vect, crs(bcm))
 # extract all bcm climate variables at each site
 bcm_clim <- extract(bcm, sites_3310)
 sites_climate <- bind_cols(site_boundaries, bcm_clim %>% select(-ID))
+
 write.csv(sites_climate, "bcm_climate.csv", row.names = FALSE)
 
 # download DEM and reproject to bcm CRS (3310) 

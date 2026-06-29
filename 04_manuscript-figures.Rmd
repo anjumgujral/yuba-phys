@@ -68,8 +68,8 @@ species_list_elev <- list(
 ### FIGURE 1A: Predawn by size
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_1A <- data.frame()
+model_summaries_1A <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -90,8 +90,7 @@ for (sp in names(species_list)) {
   TRUE          ~ "Not significant"
 )
 
-
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_1A <- dplyr::bind_rows(model_summaries_1A,
                                       data.frame(species = sp,
                                                  p_value = diam_p,
                                                  signif = signif_label))
@@ -124,7 +123,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_1A <- dplyr::bind_rows(all_preds_1A, newdata)
 }
 
 ### FIGURE 1A: Predawn WP by size
@@ -135,7 +134,7 @@ Fig1A <- ggplot() +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(
-  data = all_preds,
+  data = all_preds_1A,
   aes(x = diameter_cm, y = pred,
       color = species,
       linetype = signif),
@@ -174,8 +173,8 @@ Fig1A
 ### FIGURE 1B: Midday by size
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_1B <- data.frame()
+model_summaries_1B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -197,7 +196,7 @@ signif_label <- dplyr::case_when(
 )
 
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_1B <- dplyr::bind_rows(model_summaries_1B,
                                       data.frame(species = sp,
                                                  p_value = diam_p,
                                                  signif = signif_label))
@@ -230,7 +229,7 @@ signif_label <- dplyr::case_when(
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_1B <- dplyr::bind_rows(all_preds_1B, newdata)
 }
 
 ### FIGURE 1B: Midday WP by size
@@ -239,7 +238,7 @@ Fig1B <- ggplot() +
              aes(x = diameter_complete, y = midday_MPa_combined, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
  geom_line(
-  data = all_preds,
+  data = all_preds_1B,
   aes(x = diameter_cm, y = pred,
       color = species,
       linetype = signif),
@@ -291,8 +290,8 @@ grid.arrange(Fig1A, Fig1B, ncol = 2)
 ### FIGURE 2A: P50 by size
 ## plotting model fit trend lines and raw data points
 
-all_preds_P50 <- data.frame()
-model_summaries_P50 <- data.frame()
+all_preds_2A <- data.frame()
+model_summaries_2A <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -312,7 +311,7 @@ for (sp in names(species_list)) {
   diam_p < 0.1  ~ "Marginal",
   TRUE          ~ "Not significant"
 )
-  model_summaries_P50 <- dplyr::bind_rows(model_summaries_P50,
+  model_summaries_2A <- dplyr::bind_rows(model_summaries_2A,
                                           data.frame(species = sp,
                                                      p_value = diam_p,
                                                      signif = signif_label))
@@ -347,7 +346,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds_P50 <- dplyr::bind_rows(all_preds_P50, newdata)
+  all_preds_2A <- dplyr::bind_rows(all_preds_2A, newdata)
 }
 
 ### FIGURE 2A: P50 by diameter
@@ -358,7 +357,7 @@ Fig2A <- ggplot() +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(
-  data = all_preds_P50,
+  data = all_preds_2A,
   aes(x = diameter_cm, y = pred,
       color = species,
       linetype = signif),
@@ -397,8 +396,8 @@ Fig2A
 ### FIGURE 2B: P50 by predawn 
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_2B <- data.frame()
+model_summaries_2B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -421,7 +420,7 @@ for (sp in names(species_list)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_2B <- dplyr::bind_rows(model_summaries_2B,
                                       data.frame(species = sp,
                                                  p_value = pd_p,
                                                  signif = signif_label))
@@ -456,7 +455,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_2B <- dplyr::bind_rows(all_preds_2B, newdata)
 }
 
 ### FIGURE 2B: P50 by predawn
@@ -464,7 +463,7 @@ Fig2B <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = predawn_MPa_combined, y = P50_combined, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_2B,
             aes(x = predawn, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -505,8 +504,8 @@ Fig2B
 ### FIGURE 2C: P50_combined by canopy closure 
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_2C <- data.frame()
+model_summaries_2C <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -529,7 +528,7 @@ for (sp in names(species_list)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_2C <- dplyr::bind_rows(model_summaries_2C,
                                       data.frame(species = sp,
                                                  p_value = cc_p,
                                                  signif = signif_label))
@@ -564,7 +563,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_2C <- dplyr::bind_rows(all_preds_2C, newdata)
 }
 
 ### FIGURE 2C: P50 by canopy closure
@@ -572,7 +571,7 @@ Fig2C <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = canopy_closure, y = P50_combined, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_2C,
             aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -608,8 +607,8 @@ Fig2C
 ```{r}
 ### FIGURE 2D: P50 by elevation
 ## plotting model fit trend lines and raw data points
-all_preds_elev_P50 <- data.frame()
-model_summaries_elev_P50 <- data.frame()
+all_preds_2D <- data.frame()
+model_summaries_2D <- data.frame()
 
 for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
@@ -626,7 +625,7 @@ for (sp in names(species_list_elev)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries_elev_P50 <- dplyr::bind_rows(model_summaries_elev_P50,
+  model_summaries_2D <- dplyr::bind_rows(model_summaries_2D,
                                       data.frame(species = sp,
                                                  p_value = elev_p,
                                                  signif = signif_label))
@@ -653,7 +652,7 @@ for (sp in names(species_list_elev)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds_elev_P50 <- dplyr::bind_rows(all_preds_elev_P50, newdata)
+  all_preds_2D <- dplyr::bind_rows(all_preds_2D, newdata)
 }
 
 ### FIGURE 2D: P50 by elevation
@@ -661,7 +660,7 @@ Fig2D <- ggplot() +
   geom_point(data = trait_data1 %>% filter(species %in% names(species_list_elev)),
              aes(x = elevation_ft, y = P50_combined, color = species),
              alpha = 0.2, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_elev_P50,
+  geom_line(data = all_preds_2D,
             aes(x = elevation, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +  
@@ -696,8 +695,8 @@ grid.arrange(Fig2A, Fig2B, Fig2C, Fig2D, ncol=2, nrow=2)
 ### FIGURE 3A: HSM_predawn_P50_mean by diameter
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_3A <- data.frame()
+model_summaries_3A <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -715,7 +714,7 @@ for (sp in names(species_list)) {
   diam_p < 0.1  ~ "Marginal",
   TRUE          ~ "Not significant"
 )
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_3A <- dplyr::bind_rows(model_summaries_3A,
                                       data.frame(species = sp,
                                                  p_value = diam_p,
                                                  signif = signif_label))
@@ -745,14 +744,14 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_3A <- dplyr::bind_rows(all_preds_3A, newdata)
 }
 ### FIGURE 3A: HSM_predawn_P50_mean by diameter
 Fig3A <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = diameter_complete, y = HSM_predawn_P50_mean, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_3A,
             aes(x = diameter_cm, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -781,8 +780,8 @@ Fig3A
 ### FIGURE 3B: HSM_midday_P50_mean by diameter 
 ## plotting model fit 
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_3B <- data.frame()
+model_summaries_3B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -801,7 +800,7 @@ for (sp in names(species_list)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_3B <- dplyr::bind_rows(model_summaries_3B,
                                       data.frame(species = sp,
                                                  p_value = diam_p,
                                                  signif = signif_label))
@@ -831,14 +830,14 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_3B <- dplyr::bind_rows(all_preds_3B, newdata)
 }
 ### FIGURE 3B: HSM_midday_P50 by diameter
 Fig3B <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = diameter_complete, y = HSM_midday_P50_mean, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_3B,
             aes(x = diameter_cm, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -879,8 +878,8 @@ grid.arrange(Fig3A, Fig3B, nrow=1, ncol = 2)
 ### FIGURE 3C: HSM_predawn_P50 by canopy closure
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_3C <- data.frame()
+model_summaries_3C <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -903,7 +902,7 @@ for (sp in names(species_list)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_3C <- dplyr::bind_rows(model_summaries_3C,
                                       data.frame(species = sp,
                                                  p_value = cc_p,
                                                  signif = signif_label))
@@ -938,7 +937,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_3C <- dplyr::bind_rows(all_preds_3C, newdata)
 }
 
 ### FIGURE 3C: HSM_predawn_P50_mean by canopy closure 
@@ -946,7 +945,7 @@ Fig3C <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = canopy_closure, y = HSM_predawn_P50_mean, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_3C,
             aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -974,8 +973,8 @@ Fig3C
 
 ### FIGURE 3D: HSM_midday_P50 by canopy closure
 ## plotting model fit 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_3D <- data.frame()
+model_summaries_3D <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -998,7 +997,7 @@ for (sp in names(species_list)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_3D <- dplyr::bind_rows(model_summaries_3D,
                                       data.frame(species = sp,
                                                  p_value = cc_p,
                                                  signif = signif_label))
@@ -1033,7 +1032,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_3D <- dplyr::bind_rows(all_preds_3D, newdata)
 }
 
 # FIGURE 3D: HSM_midday_P50 by canopy closure
@@ -1041,7 +1040,7 @@ Fig3D <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = canopy_closure, y = HSM_midday_P50_mean, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_3D,
             aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1073,8 +1072,8 @@ Fig3D
 ### FIGURE 3E: HSM_predawn_P50_mean by elevation
 ## plotting model fit trend lines and raw data points
 
-all_preds_elev_HSM <- data.frame()
-model_summaries_elev_HSM <- data.frame()
+all_preds_3E <- data.frame()
+model_summaries_3E <- data.frame()
 
 for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
@@ -1091,7 +1090,7 @@ for (sp in names(species_list_elev)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries_elev_HSM <- dplyr::bind_rows(model_summaries_elev_HSM,
+  model_summaries_3E <- dplyr::bind_rows(model_summaries_3E,
                                       data.frame(species = sp,
                                                  p_value = elev_p,
                                                  signif = signif_label))
@@ -1118,7 +1117,7 @@ for (sp in names(species_list_elev)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds_elev_HSM <- dplyr::bind_rows(all_preds_elev_HSM, newdata)
+  all_preds_3E <- dplyr::bind_rows(all_preds_3E, newdata)
 }
 
 ### FIGURE 3E: HSM_predawn_P50_mean by elevation 
@@ -1126,7 +1125,7 @@ Fig3E <- ggplot() +
   geom_point(data = trait_data1 %>% dplyr::filter(species %in% names(species_list_elev)),
              aes(x = elevation_ft, y = HSM_predawn_P50_mean, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_elev_HSM,
+  geom_line(data = all_preds_3E,
             aes(x = elevation, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1154,8 +1153,8 @@ Fig3E
 
 ### FIGURE 3F: HSM_midday_P50_mean by elevation 
 ## plotting model fit 
-all_preds_elev_HSM <- data.frame()
-model_summaries_elev_HSM <- data.frame()
+all_preds_3F <- data.frame()
+model_summaries_3F <- data.frame()
 
 for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
@@ -1172,7 +1171,7 @@ for (sp in names(species_list_elev)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries_elev_HSM <- dplyr::bind_rows(model_summaries_elev_HSM,
+  model_summaries_3F <- dplyr::bind_rows(model_summaries_3F,
                                       data.frame(species = sp,
                                                  p_value = elev_p,
                                                  signif = signif_label))
@@ -1199,7 +1198,7 @@ for (sp in names(species_list_elev)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds_elev_HSM <- dplyr::bind_rows(all_preds_elev_HSM, newdata)
+  all_preds_3F <- dplyr::bind_rows(all_preds_3F, newdata)
 }
 
 ### FIGURE 3F: HSM_midday_P50_mean by elevation 
@@ -1207,7 +1206,7 @@ Fig3F <- ggplot() +
   geom_point(data = trait_data1 %>% dplyr::filter(species %in% names(species_list_elev)),
              aes(x = elevation_ft, y = HSM_midday_P50_mean, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_elev_HSM,
+  geom_line(data = all_preds_3F,
             aes(x = elevation, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1239,8 +1238,8 @@ Fig3F
 ### FIGURE 3G: HSM by predawn 
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_3G <- data.frame()
+model_summaries_3G <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -1257,7 +1256,7 @@ for (sp in names(species_list)) {
   pd_p <- summ["predawn_scaled", "Pr(>|t|)"]
   signif_label <- ifelse(pd_p < 0.05, "Significant", "Not significant")
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_3G <- dplyr::bind_rows(model_summaries_3G,
                                       data.frame(species = sp,
                                                  p_value = pd_p,
                                                  signif = signif_label))
@@ -1292,7 +1291,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_3G <- dplyr::bind_rows(all_preds_3G, newdata)
 }
 
 ### FIGURE 3G: HSM by predawn
@@ -1300,7 +1299,7 @@ Fig3G <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = predawn_MPa_combined, y = HSM_midday_P50_mean, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_3G,
             aes(x = predawn, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1342,8 +1341,8 @@ grid.arrange(Fig3A, Fig3B, Fig3C, Fig3D, Fig3E, Fig3F, blank_plot, Fig3G, ncol =
 ### Figure 4A: Internode length by diameter
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_4A <- data.frame()
+model_summaries_4A <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -1371,6 +1370,11 @@ for (sp in names(species_list)) {
   diam_p < 0.1  ~ "Marginal",
   TRUE          ~ "Not significant"
 )
+  
+   model_summaries_4A <- dplyr::bind_rows(model_summaries_4A,
+                                       data.frame(species = sp,
+                                                  p_value = diam_p,
+                                                  signif = signif_label))
   
   # Sequence of diameter values 
   mean_diam <- mean(df$diameter_complete, na.rm = TRUE)
@@ -1401,7 +1405,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
   
-  all_preds <- bind_rows(all_preds, newdata)
+  all_preds_4A <- bind_rows(all_preds_4A, newdata)
 }
 
 ### FIGURE 4A: Internode length by diameter 
@@ -1409,7 +1413,7 @@ Fig4A <- ggplot() +
   geom_point(data = bind_rows(species_list),
              aes(x = diameter_complete, y = internode_length_1_2, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_4A,
             aes(x = diameter_complete, y = pred, color = species, linetype = signif,
       alpha = signif),
             size = 1.2, na.rm = TRUE) +
@@ -1441,8 +1445,8 @@ Fig4A
 ### FIGURE 4B: Internode length by predawn water potential
 ## plotting model fit trend lines and raw data points 
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_4B <- data.frame()
+model_summaries_4B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -1464,6 +1468,11 @@ for (sp in names(species_list)) {
   pd_p < 0.1  ~ "Marginal",
   TRUE          ~ "Not significant"
 )
+  model_summaries_4B <- dplyr::bind_rows(model_summaries_4B,
+                                       data.frame(species = sp,
+                                                  p_value = pd_p,
+                                                  signif = signif_label))
+  
   # Prediction data
   mean_pd <- mean(df$predawn_MPa_combined, na.rm = TRUE)
   sd_pd   <- sd(df$predawn_MPa_combined, na.rm = TRUE)
@@ -1491,7 +1500,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_4B <- dplyr::bind_rows(all_preds_4B, newdata)
 }
 
 ### FIGURE 4B: Internode length by predawn 
@@ -1499,7 +1508,7 @@ Fig4B <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = predawn_MPa_combined, y = internode_length_1_2, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_4B,
             aes(x = predawn, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1534,8 +1543,8 @@ Fig4B
 ### FIGURE 4C: Internode length by HSM_midday_P50_mean
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_4C <- data.frame()
+model_summaries_4C <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -1557,6 +1566,10 @@ for (sp in names(species_list)) {
   hsm_p < 0.1  ~ "Marginal",
   TRUE          ~ "Not significant"
 )
+  model_summaries_4C <- dplyr::bind_rows(model_summaries_4C,
+                                       data.frame(species = sp,
+                                                  p_value = hsm_p,
+                                                  signif = signif_label))
 
   # Prediction data
   mean_hsm <- mean(df$HSM_midday_P50_mean, na.rm = TRUE)
@@ -1587,7 +1600,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_4C <- dplyr::bind_rows(all_preds_4C, newdata)
 }
 
 ### FIGURE 4C: Internode length by HSM_midday_P50_mean 
@@ -1595,7 +1608,7 @@ Fig4C <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = HSM_midday_P50_mean, y = internode_length_1_2, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_4C,
             aes(x = HSM_midday_P50_mean, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1627,8 +1640,8 @@ Fig4C
 ### FIGURE 4D: Internode length by P50
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_4D <- data.frame()
+model_summaries_4D <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -1650,7 +1663,7 @@ for (sp in names(species_list)) {
   p50_p < 0.1  ~ "Marginal",
   TRUE          ~ "Not significant"
 )
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_4D <- dplyr::bind_rows(model_summaries_4D,
                                       data.frame(species = sp,
                                                  p_value = p50_p,
                                                  signif = signif_label))
@@ -1681,7 +1694,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_4D <- dplyr::bind_rows(all_preds_4D, newdata)
 }
 
 ### FIGURE 4D: Internode length by P50
@@ -1689,7 +1702,7 @@ Fig4D <- ggplot() +
   geom_point(data = bind_rows(species_list), 
              aes(x = P50_combined, y = internode_length_1_2, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_4D,
             aes(x = P50_raw, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1722,8 +1735,8 @@ Fig4D
 ### FIGURE 4E: Internode length by canopy closure 
 ## plotting model fit 
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_4E <- data.frame()
+model_summaries_4E <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -1744,7 +1757,7 @@ for (sp in names(species_list)) {
   TRUE          ~ "Not significant"
 )
   
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_4E <- dplyr::bind_rows(model_summaries_4E,
                                       data.frame(species = sp,
                                                  p_value = canopy_p,
                                                  signif = signif_label))
@@ -1779,7 +1792,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
   
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_4E <- dplyr::bind_rows(all_preds_4E, newdata)
 }
 
 ### FIGURE 4E: Internode length by canopy closure
@@ -1787,7 +1800,7 @@ Fig4E <- ggplot() +
   geom_point(data = bind_rows(species_list),
              aes(x = canopy_closure, y = internode_length_1_2, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_4E,
             aes(x = canopy, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1820,8 +1833,8 @@ Fig4E
 ### FIGURE 4F: Internode length by elevation
 ## plotting model fit trend lines and raw data points
 
-all_preds <- data.frame()
-model_summaries <- data.frame()
+all_preds_4F <- data.frame()
+model_summaries_4F <- data.frame()
 
 for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
@@ -1838,7 +1851,7 @@ for (sp in names(species_list_elev)) {
   TRUE          ~ "Not significant"
 )
 
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_4F <- dplyr::bind_rows(model_summaries_4F,
                                       data.frame(species = sp,
                                                  p_value = elev_p,
                                                  signif = signif_label))
@@ -1860,7 +1873,7 @@ for (sp in names(species_list_elev)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_4F <- dplyr::bind_rows(all_preds_4F, newdata)
 }
 
 ### FIGURE 4F: Internode length by elevation 
@@ -1868,7 +1881,7 @@ Fig4F <- ggplot() +
   geom_point(data = bind_rows(species_list_elev),
              aes(x = elevation_ft, y = internode_length_1_2, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds,
+  geom_line(data = all_preds_4F,
             aes(x = elev, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -1901,130 +1914,84 @@ grid.arrange(Fig4A, Fig4B, Fig4C, Fig4D, Fig4E, Fig4F, ncol = 2, nrow =3)
 # Supplemental Figures
 ## water potentials
 ```{r}
-### FIGURE S1A: Predawn by elevation
-## plotting model fit
+### FIGURE S1A: Predawn by elevation ()
+## plotting model fit 
 
-all_preds       <- data.frame()
-all_partial     <- data.frame()
-model_summaries <- data.frame()
+all_preds_S1A <- data.frame()
+model_summaries_S1A <- data.frame()
 
-# ── 1. Fit models & collect trendlines + partial residuals ─────────────────
-for (sp in names(species_list)) {
+for (sp in setdiff(names(species_list), "ABMA")) {
   df <- species_list[[sp]]
-  variables <- c("predawn_MPa_combined", "diameter_complete_scaled",
-                   "canopy_closure_scaled")
-  if (sp != "ABMA") variables <- c(variables, "elevation_ft_scaled")
-
-  df_cc <- df[complete.cases(df[, variables]), ]
-  if (sp == "ABMA") {
-    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled +
-                  canopy_closure_scaled + (1|plot) + (1|wp_year), data = df_cc)
-  } else {
-    mod <- lmer(predawn_MPa_combined ~ diameter_complete_scaled +
-                  canopy_closure_scaled + elevation_ft_scaled +
-                  (1|plot) + (1|wp_year), data = df_cc)
-  }
-
-  # 1b. Significance label
-  summ         <- summary(mod)$coefficients
-  diam_p       <- summ["diameter_complete_scaled", "Pr(>|t|)"]
-  signif_label <- case_when(
-    diam_p < 0.05 ~ "Significant",
-    diam_p < 0.1  ~ "Marginal",
+  mod <- lmer(
+    predawn_MPa_2024 ~ elevation_ft_scaled + diameter_complete_scaled +
+      canopy_closure_scaled + (1|plot),
+    data = df
+  )
+  summ <- summary(mod)$coefficients
+  elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
+  signif_label <- dplyr::case_when(
+    elev_p < 0.05 ~ "Significant",
+    elev_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-
-  model_summaries <- bind_rows(model_summaries,
-    data.frame(species = sp, p_value = diam_p, signif = signif_label))
-
-  # 1c. Scaling constants
-  mean_d <- mean(df$diameter_complete, na.rm = TRUE)
-  sd_d   <- sd(df$diameter_complete,   na.rm = TRUE)
-
-  # ── Trendline (all_preds) ──────────────────────────────────────────────
-  diam_seq <- seq(min(df$diameter_complete, na.rm = TRUE),
-                  max(df$diameter_complete, na.rm = TRUE),
+  model_summaries_S1A <- dplyr::bind_rows(model_summaries_S1A,
+    data.frame(species = sp, p_value = elev_p, signif = signif_label))
+  mean_e <- mean(df$elevation_ft, na.rm = TRUE)
+  sd_e   <- sd(df$elevation_ft, na.rm = TRUE)
+  elev_seq <- seq(min(df$elevation_ft, na.rm = TRUE),
+                  max(df$elevation_ft, na.rm = TRUE),
                   length.out = 100)
-
   newdata <- data.frame(
-    diameter_complete_scaled = (diam_seq - mean_d) / sd_d,
-    canopy_closure_scaled    = 0
+    elevation_ft_scaled = (elev_seq - mean_e) / sd_e,
+    diameter_complete_scaled = 0,
+    canopy_closure_scaled = 0
   )
-  if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
-
-  newdata$diameter_cm <- diam_seq
-  newdata$pred        <- predict(mod, newdata, re.form = NA)
-  newdata$species     <- sp
-  newdata$signif      <- signif_label
-
-  all_preds <- bind_rows(all_preds, newdata)
-
-  # ── Partial residuals (all_partial) ───────────────────────────────────
-  vars_needed <- c("predawn_MPa_combined", "diameter_complete_scaled",
-                   "canopy_closure_scaled")
-  if (sp != "ABMA") vars_needed <- c(vars_needed, "elevation_ft_scaled")
-
-  df_cc <- df[complete.cases(df[, vars_needed]), ]
-
-  # Fixed effects
-  beta_diam      <- fixef(mod)["diameter_complete_scaled"]
-  beta_intercept <- fixef(mod)["(Intercept)"]
-
-  # Partial resid on MPa scale:
-  # intercept + diameter effect + residual
-  # (equivalent to prediction at mean covariates + unexplained noise)
-  df_cc$partial_resid <- beta_intercept +
-                         beta_diam * df_cc$diameter_complete_scaled +
-                         residuals(mod)
-
-  # Back-transform scaled diameter → cm for shared x-axis
-  df_cc$diameter_cm <- df_cc$diameter_complete_scaled * sd_d + mean_d
-
-  df_cc$species <- sp
-  df_cc$signif  <- signif_label
-
-  all_partial <- bind_rows(all_partial, df_cc)
+  newdata$elev_ft <- elev_seq
+  newdata$pred <- predict(mod, newdata, re.form = NA)
+  newdata$species <- sp
+  newdata$signif <- signif_label
+  all_preds_S1A <- dplyr::bind_rows(all_preds_S1A, newdata)
 }
 
-S2A <- ggplot() +
+S1A <- ggplot() +
   geom_point(
-    data  = all_partial,
-    aes(x = diameter_cm, y = -partial_resid, color = species),  # negate here
-    alpha = 0.2, size = 1.8, na.rm = TRUE
+    data = subset(trait_data1, species != "ABMA"),
+    aes(x = elevation_ft, y = predawn_MPa_2024, color = species),
+    size = 2, alpha = 0.2
   ) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(
-    data = all_preds,
-    aes(x = diameter_cm, y = -pred,  # and here
-        color    = species,
-        linetype = signif),
-    linewidth = 1.2, na.rm = TRUE
+    data = all_preds_S1A,
+    aes(x = elev_ft, y = pred, color = species, linetype = signif),
+    size = 1.2
   ) +
   scale_color_manual(values = species_colors) +
   scale_linetype_manual(values = c(
-    "Significant"     = "solid",
-    "Marginal"        = "dashed",
+    "Significant" = "solid",
+    "Marginal" = "dashed",
     "Not significant" = "dotted"
   )) +
   labs(
-    x = "Basal diameter (cm)",
-    y = expression(Psi[predawn] ~ "(MPa)")
+    x = "Elevation (ft)",
+    y = expression(Psi[predawn]~"(MPa)"~"2024")
+  ) + scale_y_reverse(
+  labels = function(x) paste0("\u2212", x)
+) +
+  scale_x_continuous(
+    breaks = seq(
+      floor(min(trait_data1$elevation_ft, na.rm = TRUE)),
+      ceiling(max(trait_data1$elevation_ft, na.rm = TRUE)),
+      by = 500
+    )
   ) +
-  theme(
-    panel.background = element_rect(fill = "white", color = NA),
-    panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
-    panel.grid       = element_blank(),
-    axis.line        = element_blank(),
-    plot.background  = element_rect(fill = "white", color = NA),
-    legend.position  = "none"
-  )
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        legend.position = "none")
+S1A
 
-S2A
-
-# ======================
-# S1B: model + predictions
-# ======================
+### FIGURE S1B: Midday by elevation
+## plotting model fit with partial residuals
 
 all_preds_S1B <- data.frame()
 model_summaries_S1B <- data.frame()
@@ -2047,6 +2014,10 @@ for (sp in setdiff(names(species_list), "ABMA")) {
     elev_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
+  model_summaries_S1B <- dplyr::bind_rows(model_summaries_S1B,
+    data.frame(species = sp, 
+               p_value = elev_p, 
+               signif = signif_label))
 
   mean_e <- mean(df$elevation_ft, na.rm = TRUE)
   sd_e   <- sd(df$elevation_ft, na.rm = TRUE)
@@ -2068,10 +2039,6 @@ for (sp in setdiff(names(species_list), "ABMA")) {
 
   all_preds_S1B <- dplyr::bind_rows(all_preds_S1B, newdata)
 }
-
-# ======================
-# S1B: plot
-# ======================
 
 S1B <- ggplot() +
   geom_point(
@@ -2112,9 +2079,8 @@ S1B <- ggplot() +
 S1B
 
 
-# ======================
-# S1C: model + predictions
-# ======================
+### FIGURE S1C: Predawn by elevation (2025)
+## plotting model fit 
 
 all_preds_S1C <- data.frame()
 model_summaries_S1C <- data.frame()
@@ -2166,10 +2132,6 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   all_preds_S1C <- dplyr::bind_rows(all_preds_S1C, newdata)
 }
 
-# ======================
-# S1C: plot
-# ======================
-
 S1C <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
@@ -2213,9 +2175,8 @@ S1C <- ggplot() +
 S1C
 
 
-# ======================
-# S1D: model + predictions
-# ======================
+### FIGURE S1D: Midday by elevation (2025)
+## plotting model fit 
 
 all_preds_S1D <- data.frame()
 model_summaries_S1D <- data.frame()
@@ -2267,9 +2228,6 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   all_preds_S1D <- dplyr::bind_rows(all_preds_S1D, newdata)
 }
 
-# ======================
-# S1D: plot
-# ======================
 
 S1D <- ggplot() +
   geom_point(
@@ -2312,10 +2270,8 @@ S1D <- ggplot() +
 
 S1D
 
-
-# ======================
-# S1E: model + predictions
-# ======================
+### FIGURE S1E: Predawn by elevation (2-year average)
+## plotting model fit 
 
 all_preds_S1E <- data.frame()
 model_summaries_S1E <- data.frame()
@@ -2367,10 +2323,6 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   all_preds_S1E <- dplyr::bind_rows(all_preds_S1E, newdata)
 }
 
-# ======================
-# S1E: plot
-# ======================
-
 S1E <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
@@ -2412,10 +2364,8 @@ S1E <- ggplot() +
 
 S1E
 
-
-# ======================
-# S1F: model + predictions
-# ======================
+### FIGURE S1F: Midday by elevation (2-year average)
+## plotting model fit 
 
 all_preds_S1F <- data.frame()
 model_summaries_S1F <- data.frame()
@@ -2467,10 +2417,6 @@ for (sp in setdiff(names(species_list), "ABMA")) {
   all_preds_S1F <- dplyr::bind_rows(all_preds_S1F, newdata)
 }
 
-# ======================
-# S1F: plot
-# ======================
-
 S1F <- ggplot() +
   geom_point(
     data = subset(trait_data1, species != "ABMA"),
@@ -2517,12 +2463,12 @@ grid.arrange(S1A, S1B, S1C, S1D, S1E, S1F, nrow = 3, ncol = 2)
 ## partial residuals
 ### WP x diameter
 ```{r}
-### FIGURE 1A: Predawn WP by size
+### FIGURE S2A: Predawn WP by size
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds <- data.frame()
-all_partial <- data.frame()
-model_summaries <- data.frame()
+all_preds_S2A <- data.frame()
+all_partial_S2A <- data.frame()
+model_summaries_S2A <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -2549,7 +2495,7 @@ for (sp in names(species_list)) {
     TRUE          ~ "Not significant"
   )
   
-  model_summaries <- dplyr::bind_rows(model_summaries,
+  model_summaries_S2A <- dplyr::bind_rows(model_summaries_S2A,
                                       data.frame(species = sp,
                                                  p_value = diam_p,
                                                  signif = signif_label))
@@ -2581,7 +2527,7 @@ for (sp in names(species_list)) {
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif <- signif_label
-  all_preds <- dplyr::bind_rows(all_preds, newdata)
+  all_preds_S2A <- dplyr::bind_rows(all_preds_S2A, newdata)
   
   # Partial residuals
   beta_diam      <- fixef(mod)["diameter_complete_scaled"]
@@ -2592,20 +2538,20 @@ for (sp in names(species_list)) {
   df_cc$diameter_cm <- df_cc$diameter_complete
   df_cc$species     <- sp
   df_cc$signif      <- signif_label
-  all_partial <- dplyr::bind_rows(all_partial, df_cc)
+  all_partial_S2A <- dplyr::bind_rows(all_partial_S2A, df_cc)
 }
 
 
-S1A <- ggplot() +
+S2A <- ggplot() +
   geom_point(
-    data  = all_partial,
+    data  = all_partial_S2A,
     aes(x = diameter_cm, y = -partial_resid, color = species),
     alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(
-    data = all_preds,
+    data = all_preds_S2A,
     aes(x = diameter_cm, y = -pred,
         color    = species,
         linetype = signif),
@@ -2629,14 +2575,14 @@ S1A <- ggplot() +
     plot.background  = element_rect(fill = "white", color = NA),
     legend.position  = "none"
   )
-S1A
+S2A
 
-### FIGURE 1B: Midday WP by size
+### FIGURE S2B: Midday WP by size
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_mid       <- data.frame()
-all_partial_mid     <- data.frame()
-model_summaries_mid <- data.frame()
+all_preds_S2B       <- data.frame()
+all_partial_S2B     <- data.frame()
+model_summaries_S2B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -2663,7 +2609,7 @@ for (sp in names(species_list)) {
     TRUE          ~ "Not significant"
   )
   
-  model_summaries_mid <- dplyr::bind_rows(model_summaries_mid,
+  model_summaries_S2B <- dplyr::bind_rows(model_summaries_S2B,
                                           data.frame(species = sp,
                                                      p_value = diam_p,
                                                      signif = signif_label))
@@ -2695,7 +2641,7 @@ for (sp in names(species_list)) {
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif <- signif_label
-  all_preds_mid <- dplyr::bind_rows(all_preds_mid, newdata)
+  all_preds_S2B <- dplyr::bind_rows(all_preds_S2B, newdata)
   
   # Partial residuals
   beta_diam      <- fixef(mod)["diameter_complete_scaled"]
@@ -2706,19 +2652,19 @@ for (sp in names(species_list)) {
   df_cc$diameter_cm <- df_cc$diameter_complete
   df_cc$species     <- sp
   df_cc$signif      <- signif_label
-  all_partial_mid <- dplyr::bind_rows(all_partial_mid, df_cc)
+  all_partial_S2B <- dplyr::bind_rows(all_partial_S2B, df_cc)
 }
 
 S2B <- ggplot() +
   geom_point(
-    data  = all_partial_mid,
+    data  = all_partial_S2B,
     aes(x = diameter_cm, y = -partial_resid, color = species),
     alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
   geom_line(
-    data = all_preds_mid,
+    data = all_preds_S2B,
     aes(x = diameter_cm, y = -pred,
         color    = species,
         linetype = signif),
@@ -2744,34 +2690,34 @@ S2B <- ggplot() +
   )
 
 ### Paired plot with shared y-axis
-ymin <- min(c(-all_partial$partial_resid, -all_partial_mid$partial_resid), na.rm = TRUE)
-ymax <- max(c(-all_partial$partial_resid, -all_partial_mid$partial_resid), na.rm = TRUE)
-xmin <- min(c(all_partial$diameter_cm, all_partial_mid$diameter_cm), na.rm = TRUE)
-xmax <- max(c(all_partial$diameter_cm, all_partial_mid$diameter_cm), na.rm = TRUE)
+ymin <- min(c(-all_partial_S2A$partial_resid, -all_partial_S2B$partial_resid), na.rm = TRUE)
+ymax <- max(c(-all_partial_S2A$partial_resid, -all_partial_S2B$partial_resid), na.rm = TRUE)
+xmin <- min(c(all_partial_S2A$diameter_cm, all_partial_S2B$diameter_cm), na.rm = TRUE)
+xmax <- max(c(all_partial_S2A$diameter_cm, all_partial_S2B$diameter_cm), na.rm = TRUE)
 
-S1A <- S1A + coord_cartesian(xlim = c(xmin, xmax), ylim = c(ymin, ymax))
+S2A <- S2A + coord_cartesian(xlim = c(xmin, xmax), ylim = c(ymin, ymax))
 S2B <- S2B + coord_cartesian(xlim = c(xmin, xmax), ylim = c(ymin, ymax))
 
-grid.arrange(S1A, S2B, ncol = 2)
+grid.arrange(S2A, S2B, ncol = 2)
 
-# for fun, you can check that partial residuals are being properly plotted
+# you can check that partial residuals are being properly plotted
 
 # Should be significant
-cor.test(all_partial$partial_resid, all_partial$diameter_complete_scaled)
+cor.test(all_partial_S2A$partial_resid, all_partial_S2A$diameter_complete_scaled)
 
 # Should be near zero — canopy closure and elevation effect has been removed
-cor.test(all_partial$partial_resid, all_partial$canopy_closure_scaled)
-cor.test(all_partial$partial_resid, all_partial$elevation_ft_scaled)
+cor.test(all_partial_S2A$partial_resid, all_partial_S2A$canopy_closure_scaled)
+cor.test(all_partial_S2A$partial_resid, all_partial_S2A$elevation_ft_scaled)
 
 ```
 ### P50
 ```{r}
-### FIGURE 3A: P50 by diameter
+### FIGURE S3A: P50 by diameter
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_3A   <- data.frame()
-all_partial_3A <- data.frame()
-model_summaries_3A <- data.frame()
+all_preds_S3A   <- data.frame()
+all_partial_S3A <- data.frame()
+model_summaries_S3A <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -2797,7 +2743,7 @@ for (sp in names(species_list)) {
     diam_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-  model_summaries_3A <- bind_rows(model_summaries_3A,
+  model_summaries_S3A <- bind_rows(model_summaries_S3A,
     data.frame(species = sp, p_value = diam_p, signif = signif_label))
 
   mean_d <- mean(df_cc$diameter_complete, na.rm = TRUE)
@@ -2816,7 +2762,7 @@ for (sp in names(species_list)) {
   newdata$pred        <- predict(mod, newdata, re.form = NA)
   newdata$species     <- sp
   newdata$signif      <- signif_label
-  all_preds_3A <- bind_rows(all_preds_3A, newdata)
+  all_preds_S3A <- bind_rows(all_preds_S3A, newdata)
 
   beta_diam      <- fixef(mod)["diameter_complete_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -2826,15 +2772,40 @@ for (sp in names(species_list)) {
   df_cc$x_var    <- df_cc$diameter_complete
   df_cc$species  <- sp
   df_cc$signif   <- signif_label
-  all_partial_3A <- bind_rows(all_partial_3A, df_cc)
+  all_partial_S3A <- bind_rows(all_partial_S3A, df_cc)
 }
 
-### FIGURE 3B: P50 by predawn
+S3A <- ggplot() +
+  geom_point(data = all_partial_S3A,
+             aes(x = x_var, y = -partial_resid, color = species),
+             alpha = 0.15, size = 1.5, na.rm = TRUE) +
+  scale_color_manual(values = species_colors) +
+  new_scale_color() +
+  geom_line(data = all_preds_S3A,
+            aes(x = diameter_cm, y = -pred, color = species, linetype = signif),
+            linewidth = 1.2, na.rm = TRUE) +
+  scale_color_manual(values = species_colors) +
+  scale_linetype_manual(values = c(
+    "Significant"     = "solid",
+    "Marginal"        = "dashed",
+    "Not significant" = "dotted"
+  )) +
+  labs(x = "Basal diameter (cm)", y = expression(P[50] ~ "(MPa)")) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
+    panel.grid       = element_blank(),
+    axis.line        = element_blank(),
+    plot.background  = element_rect(fill = "white", color = NA),
+    legend.position  = "none"
+  )
+
+### FIGURE S3B: P50 by predawn
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_3B   <- data.frame()
-all_partial_3B <- data.frame()
-model_summaries_3B <- data.frame()
+all_preds_S3B   <- data.frame()
+all_partial_S3B <- data.frame()
+model_summaries_S3B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -2860,7 +2831,7 @@ for (sp in names(species_list)) {
     pd_p < 0.1  ~ "Marginal",
     TRUE        ~ "Not significant"
   )
-  model_summaries_3B <- bind_rows(model_summaries_3B,
+  model_summaries_S3B <- bind_rows(model_summaries_S3B,
     data.frame(species = sp, p_value = pd_p, signif = signif_label))
 
   mean_pd <- mean(df_cc$predawn_MPa_combined, na.rm = TRUE)
@@ -2879,7 +2850,7 @@ for (sp in names(species_list)) {
   newdata$pred     <- predict(mod, newdata, re.form = NA)
   newdata$species  <- sp
   newdata$signif   <- signif_label
-  all_preds_3B <- bind_rows(all_preds_3B, newdata)
+  all_preds_S3B <- bind_rows(all_preds_S3B, newdata)
 
   beta_pd        <- fixef(mod)["predawn_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -2889,15 +2860,41 @@ for (sp in names(species_list)) {
   df_cc$x_var   <- df_cc$predawn_MPa_combined
   df_cc$species <- sp
   df_cc$signif  <- signif_label
-  all_partial_3B <- bind_rows(all_partial_3B, df_cc)
+  all_partial_S3B <- bind_rows(all_partial_S3B, df_cc)
 }
 
-### FIGURE 3C: P50 by canopy closure
+S3B <- ggplot() +
+  geom_point(data = all_partial_S3B,
+             aes(x = -x_var, y = -partial_resid, color = species),
+             alpha = 0.15, size = 1.5, na.rm = TRUE) +
+  scale_color_manual(values = species_colors) +
+  new_scale_color() +
+  geom_line(data = all_preds_S3B,
+            aes(x = -predawn, y = -pred, color = species, linetype = signif),
+            linewidth = 1.2, na.rm = TRUE) +
+  scale_color_manual(values = species_colors) +
+  scale_linetype_manual(values = c(
+    "Significant"     = "solid",
+    "Marginal"        = "dashed",
+    "Not significant" = "dotted"
+  )) +
+  labs(x = expression(Psi[predawn] ~ "(MPa)"), y = expression(P[50] ~ "(MPa)")) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
+    panel.grid       = element_blank(),
+    axis.line        = element_blank(),
+    plot.background  = element_rect(fill = "white", color = NA),
+    legend.position  = "none"
+  )
+S3B
+
+### FIGURE S3C: P50 by canopy closure
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_3C   <- data.frame()
-all_partial_3C <- data.frame()
-model_summaries_3C <- data.frame()
+all_preds_S3C   <- data.frame()
+all_partial_S3C <- data.frame()
+model_summaries_S3C <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -2923,7 +2920,7 @@ for (sp in names(species_list)) {
     cc_p < 0.1  ~ "Marginal",
     TRUE        ~ "Not significant"
   )
-  model_summaries_3C <- bind_rows(model_summaries_3C,
+  model_summaries_S3C <- bind_rows(model_summaries_S3C,
     data.frame(species = sp, p_value = cc_p, signif = signif_label))
 
   mean_cc <- mean(df_cc$canopy_closure, na.rm = TRUE)
@@ -2942,7 +2939,7 @@ for (sp in names(species_list)) {
   newdata$pred           <- predict(mod, newdata, re.form = NA)
   newdata$species        <- sp
   newdata$signif         <- signif_label
-  all_preds_3C <- bind_rows(all_preds_3C, newdata)
+  all_preds_S3C <- bind_rows(all_preds_S3C, newdata)
 
   beta_cc        <- fixef(mod)["canopy_closure_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -2952,15 +2949,41 @@ for (sp in names(species_list)) {
   df_cc$x_var   <- df_cc$canopy_closure
   df_cc$species <- sp
   df_cc$signif  <- signif_label
-  all_partial_3C <- bind_rows(all_partial_3C, df_cc)
+  all_partial_S3C <- bind_rows(all_partial_S3C, df_cc)
 }
 
-### FIGURE 3D: P50 by elevation
+S3C <- ggplot() +
+  geom_point(data = all_partial_S3C,
+             aes(x = x_var, y = -partial_resid, color = species),
+             alpha = 0.15, size = 1.5, na.rm = TRUE) +
+  scale_color_manual(values = species_colors) +
+  new_scale_color() +
+  geom_line(data = all_preds_S3C,
+            aes(x = canopy_closure, y = -pred, color = species, linetype = signif),
+            linewidth = 1.2, na.rm = TRUE) +
+  scale_color_manual(values = species_colors) +
+  scale_linetype_manual(values = c(
+    "Significant"     = "solid",
+    "Marginal"        = "dashed",
+    "Not significant" = "dotted"
+  )) +
+  labs(x = "Canopy closure (%)", y = expression(P[50] ~ "(MPa)")) +
+  theme(
+    panel.background = element_rect(fill = "white", color = NA),
+    panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
+    panel.grid       = element_blank(),
+    axis.line        = element_blank(),
+    plot.background  = element_rect(fill = "white", color = NA),
+    legend.position  = "none"
+  )
+S3C
+
+### FIGURE S3D: P50 by elevation
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_3D   <- data.frame()
-all_partial_3D <- data.frame()
-model_summaries_3D <- data.frame()
+all_preds_S3D   <- data.frame()
+all_partial_S3D <- data.frame()
+model_summaries_S3D <- data.frame()
 
 for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
@@ -2980,7 +3003,7 @@ for (sp in names(species_list_elev)) {
     elev_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-  model_summaries_3D <- bind_rows(model_summaries_3D,
+  model_summaries_S3D <- bind_rows(model_summaries_S3D,
     data.frame(species = sp, p_value = elev_p, signif = signif_label))
 
   mean_elev <- mean(df_cc$elevation_ft, na.rm = TRUE)
@@ -2999,7 +3022,7 @@ for (sp in names(species_list_elev)) {
   newdata$pred      <- predict(mod, newdata, re.form = NA)
   newdata$species   <- sp
   newdata$signif    <- signif_label
-  all_preds_3D <- bind_rows(all_preds_3D, newdata)
+  all_preds_S3D <- bind_rows(all_preds_S3D, newdata)
 
   beta_elev      <- fixef(mod)["elevation_ft_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -3009,92 +3032,16 @@ for (sp in names(species_list_elev)) {
   df_cc$x_var   <- df_cc$elevation_ft
   df_cc$species <- sp
   df_cc$signif  <- signif_label
-  all_partial_3D <- bind_rows(all_partial_3D, df_cc)
+  all_partial_S3D <- bind_rows(all_partial_S3D, df_cc)
 }
 
-### Plots
-S3A <- ggplot() +
-  geom_point(data = all_partial_3A,
-             aes(x = x_var, y = -partial_resid, color = species),
-             alpha = 0.15, size = 1.5, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
-  geom_line(data = all_preds_3A,
-            aes(x = diameter_cm, y = -pred, color = species, linetype = signif),
-            linewidth = 1.2, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  scale_linetype_manual(values = c(
-    "Significant"     = "solid",
-    "Marginal"        = "dashed",
-    "Not significant" = "dotted"
-  )) +
-  labs(x = "Basal diameter (cm)", y = expression(P[50] ~ "(MPa)")) +
-  theme(
-    panel.background = element_rect(fill = "white", color = NA),
-    panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
-    panel.grid       = element_blank(),
-    axis.line        = element_blank(),
-    plot.background  = element_rect(fill = "white", color = NA),
-    legend.position  = "none"
-  )
-
-S3B <- ggplot() +
-  geom_point(data = all_partial_3B,
-             aes(x = -x_var, y = -partial_resid, color = species),
-             alpha = 0.15, size = 1.5, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
-  geom_line(data = all_preds_3B,
-            aes(x = -predawn, y = -pred, color = species, linetype = signif),
-            linewidth = 1.2, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  scale_linetype_manual(values = c(
-    "Significant"     = "solid",
-    "Marginal"        = "dashed",
-    "Not significant" = "dotted"
-  )) +
-  labs(x = expression(Psi[predawn] ~ "(MPa)"), y = expression(P[50] ~ "(MPa)")) +
-  theme(
-    panel.background = element_rect(fill = "white", color = NA),
-    panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
-    panel.grid       = element_blank(),
-    axis.line        = element_blank(),
-    plot.background  = element_rect(fill = "white", color = NA),
-    legend.position  = "none"
-  )
-
-S3C <- ggplot() +
-  geom_point(data = all_partial_3C,
-             aes(x = x_var, y = -partial_resid, color = species),
-             alpha = 0.15, size = 1.5, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
-  geom_line(data = all_preds_3C,
-            aes(x = canopy_closure, y = -pred, color = species, linetype = signif),
-            linewidth = 1.2, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  scale_linetype_manual(values = c(
-    "Significant"     = "solid",
-    "Marginal"        = "dashed",
-    "Not significant" = "dotted"
-  )) +
-  labs(x = "Canopy closure (%)", y = expression(P[50] ~ "(MPa)")) +
-  theme(
-    panel.background = element_rect(fill = "white", color = NA),
-    panel.border     = element_rect(color = "gray50", fill = NA, linewidth = 1),
-    panel.grid       = element_blank(),
-    axis.line        = element_blank(),
-    plot.background  = element_rect(fill = "white", color = NA),
-    legend.position  = "none"
-  )
-
 S3D <- ggplot() +
-  geom_point(data = all_partial_3D,
+  geom_point(data = all_partial_S3D,
              aes(x = x_var, y = -partial_resid, color = species),
              alpha = 0.15, size = 1.5, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   new_scale_color() +
-  geom_line(data = all_preds_3D,
+  geom_line(data = all_preds_S3D,
             aes(x = elevation, y = -pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -3112,12 +3059,13 @@ S3D <- ggplot() +
     plot.background  = element_rect(fill = "white", color = NA),
     legend.position  = "none"
   )
+S3D
 
 ### Shared y-axis
-ymin <- min(c(-all_partial_3A$partial_resid, -all_partial_3B$partial_resid,
-              -all_partial_3C$partial_resid, -all_partial_3D$partial_resid), na.rm = TRUE)
-ymax <- max(c(-all_partial_3A$partial_resid, -all_partial_3B$partial_resid,
-              -all_partial_3C$partial_resid, -all_partial_3D$partial_resid), na.rm = TRUE)
+ymin <- min(c(-all_partial_S3A$partial_resid, -all_partial_S3B$partial_resid,
+              -all_partial_S3C$partial_resid, -all_partial_S3D$partial_resid), na.rm = TRUE)
+ymax <- max(c(-all_partial_S3A$partial_resid, -all_partial_S3B$partial_resid,
+              -all_partial_S3C$partial_resid, -all_partial_S3D$partial_resid), na.rm = TRUE)
 
 S3A <- S3A + coord_cartesian(ylim = c(ymin, ymax))
 S3B <- S3B + coord_cartesian(ylim = c(ymin, ymax))
@@ -3129,12 +3077,12 @@ grid.arrange(S3A, S3B, S3C, S3D, ncol = 2, nrow = 2)
 
 ### HSM
 ```{r}
-### FIGURE 4A: HSM (predawn) by diameter
+### FIGURE S4A: HSM (predawn) by diameter
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_4A <- data.frame()
-all_partial_4A <- data.frame()
-model_summaries_4A <- data.frame()
+all_preds_S4A <- data.frame()
+all_partial_S4A <- data.frame()
+model_summaries_S4A <- data.frame()
 
 for (sp in names(species_list)) {
 
@@ -3148,7 +3096,6 @@ for (sp in names(species_list)) {
 
   df_cc <- df[complete.cases(df[, vars]), ]
 
-  # ---- Model ----
   if (sp == "ABMA") {
     mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled +
                   canopy_closure_scaled +
@@ -3162,7 +3109,6 @@ for (sp in names(species_list)) {
                 data = df_cc)
   }
 
-  # ---- Significance ----
   summ <- summary(mod)$coefficients
   pval <- summ["diameter_complete_scaled", "Pr(>|t|)"]
 
@@ -3172,12 +3118,11 @@ for (sp in names(species_list)) {
     TRUE        ~ "Not significant"
   )
 
-  model_summaries_4A <- dplyr::bind_rows(
-    model_summaries_4A,
+  model_summaries_S4A <- dplyr::bind_rows(
+    model_summaries_S4A,
     data.frame(species = sp, p_value = pval, signif = signif_label)
   )
 
-  # ---- Predictions (same as S1A) ----
   mean_d <- mean(df_cc$diameter_complete)
   sd_d   <- sd(df_cc$diameter_complete)
 
@@ -3196,9 +3141,8 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif  <- signif_label
 
-  all_preds_4A <- dplyr::bind_rows(all_preds_4A, newdata)
+  all_preds_S4A <- dplyr::bind_rows(all_preds_S4A, newdata)
 
-  # ---- Partial residuals (IDENTICAL to S1A logic) ----
   beta <- fixef(mod)["diameter_complete_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
 
@@ -3210,18 +3154,17 @@ for (sp in names(species_list)) {
   df_cc$species <- sp
   df_cc$signif  <- signif_label
 
-  all_partial_4A <- dplyr::bind_rows(all_partial_4A, df_cc)
+  all_partial_S4A <- dplyr::bind_rows(all_partial_S4A, df_cc)
 }
 
-# ---- Plot ----
 S4A <- ggplot() +
   geom_point(
-    data = all_partial_4A,
+    data = all_partial_S4A,
     aes(x = diameter_cm, y = partial_resid, color = species),
     alpha = 0.15, size = 2
   ) +
   geom_line(
-    data = all_preds_4A,
+    data = all_preds_S4A,
     aes(x = diameter_cm, y = pred,
         color = species, linetype = signif),
     linewidth = 1.2
@@ -3244,12 +3187,12 @@ S4A <- ggplot() +
   )
 S4A
 
-### FIGURE 4B: HSM (midday) by diameter
+### FIGURE S4B: HSM (midday) by diameter
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_4B <- data.frame()
-all_partial_4B <- data.frame()
-model_summaries_4B <- data.frame()
+all_preds_S4B <- data.frame()
+all_partial_S4B <- data.frame()
+model_summaries_S4B <- data.frame()
 
 for (sp in names(species_list)) {
 
@@ -3283,7 +3226,7 @@ for (sp in names(species_list)) {
     TRUE        ~ "Not significant"
   )
 
-  model_summaries_4B <- dplyr::bind_rows(model_summaries_4B,
+  model_summaries_S4B <- dplyr::bind_rows(model_summaries_S4B,
     data.frame(species = sp, p_value = pval, signif = signif_label))
 
   mean_d <- mean(df_cc$diameter_complete)
@@ -3304,7 +3247,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif <- signif_label
 
-  all_preds_4B <- dplyr::bind_rows(all_preds_4B, newdata)
+  all_preds_S4B <- dplyr::bind_rows(all_preds_S4B, newdata)
 
   beta <- fixef(mod)["diameter_complete_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
@@ -3317,14 +3260,14 @@ for (sp in names(species_list)) {
   df_cc$species <- sp
   df_cc$signif  <- signif_label
 
-  all_partial_4B <- dplyr::bind_rows(all_partial_4B, df_cc)
+  all_partial_S4B <- dplyr::bind_rows(all_partial_S4B, df_cc)
 }
 
 S4B <- ggplot() +
-  geom_point(data = all_partial_4B,
+  geom_point(data = all_partial_S4B,
              aes(x = diameter_cm, y = partial_resid, color = species),
              alpha = 0.15, size = 2) +
-  geom_line(data = all_preds_4B,
+  geom_line(data = all_preds_S4B,
             aes(x = diameter_cm, y = pred,
                 color = species, linetype = signif),
             linewidth = 1.2) +
@@ -3343,12 +3286,12 @@ S4B <- ggplot() +
 
 S4B
 
-### FIGURE 4C: HSM (predawn) by canopy closure
+### FIGURE S4C: HSM (predawn) by canopy closure
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_4C <- data.frame()
-all_partial_4C <- data.frame()
-model_summaries_4C <- data.frame()
+all_preds_S4C <- data.frame()
+all_partial_S4C <- data.frame()
+model_summaries_S4C <- data.frame()
 
 for (sp in names(species_list)) {
 
@@ -3382,7 +3325,11 @@ for (sp in names(species_list)) {
     pval < 0.1  ~ "Marginal",
     TRUE        ~ "Not significant"
   )
-
+  
+  model_summaries_S4C <- dplyr::bind_rows(model_summaries_S4C,
+                                        data.frame(species = sp,
+                                                   p_value = pval,
+                                                   signif = signif_label))
   mean_cc <- mean(df_cc$canopy_closure)
   sd_cc   <- sd(df_cc$canopy_closure)
 
@@ -3402,7 +3349,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif  <- signif_label
 
-  all_preds_4C <- dplyr::bind_rows(all_preds_4C, newdata)
+  all_preds_S4C <- dplyr::bind_rows(all_preds_S4C, newdata)
 
   beta <- fixef(mod)["canopy_closure_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
@@ -3415,14 +3362,14 @@ for (sp in names(species_list)) {
   df_cc$species <- sp
   df_cc$signif  <- signif_label
 
-  all_partial_4C <- dplyr::bind_rows(all_partial_4C, df_cc)
+  all_partial_S4C <- dplyr::bind_rows(all_partial_S4C, df_cc)
 }
 
 S4C <- ggplot() +
-  geom_point(data = all_partial_4C,
+  geom_point(data = all_partial_S4C,
              aes(x = canopy_closure_raw, y = partial_resid, color = species),
              alpha = 0.15, size = 2) +
-  geom_line(data = all_preds_4C,
+  geom_line(data = all_preds_S4C,
             aes(x = canopy_closure, y = pred,
                 color = species, linetype = signif),
             linewidth = 1.2) +
@@ -3440,12 +3387,12 @@ S4C <- ggplot() +
   )
 S4C
 
-### FIGURE 4D: HSM (midday) by canopy closure
+### FIGURE S4D: HSM (midday) by canopy closure
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_4D <- data.frame()
-all_partial_4D <- data.frame()
-model_summaries_4D <- data.frame()
+all_preds_S4D <- data.frame()
+all_partial_S4D <- data.frame()
+model_summaries_S4D <- data.frame()
 
 for (sp in names(species_list)) {
 
@@ -3479,6 +3426,11 @@ for (sp in names(species_list)) {
     pval < 0.1  ~ "Marginal",
     TRUE        ~ "Not significant"
   )
+  
+  model_summaries_S4D <- dplyr::bind_rows(model_summaries_S4D,
+                                        data.frame(species = sp,
+                                                   p_value = pval,
+                                                   signif = signif_label))
 
   mean_cc <- mean(df_cc$canopy_closure)
   sd_cc   <- sd(df_cc$canopy_closure)
@@ -3499,7 +3451,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif  <- signif_label
 
-  all_preds_4D <- dplyr::bind_rows(all_preds_4D, newdata)
+  all_preds_S4D <- dplyr::bind_rows(all_preds_S4D, newdata)
 
   beta <- fixef(mod)["canopy_closure_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
@@ -3512,14 +3464,14 @@ for (sp in names(species_list)) {
   df_cc$species <- sp
   df_cc$signif  <- signif_label
 
-  all_partial_4D <- dplyr::bind_rows(all_partial_4D, df_cc)
+  all_partial_S4D <- dplyr::bind_rows(all_partial_S4D, df_cc)
 }
 
 S4D <- ggplot() +
-  geom_point(data = all_partial_4D,
+  geom_point(data = all_partial_S4D,
              aes(x = canopy_closure_raw, y = partial_resid, color = species),
              alpha = 0.15, size = 2) +
-  geom_line(data = all_preds_4D,
+  geom_line(data = all_preds_S4D,
             aes(x = canopy_closure, y = pred,
                 color = species, linetype = signif),
             linewidth = 1.2) +
@@ -3537,12 +3489,12 @@ S4D <- ggplot() +
   )
 S4D
 
-### FIGURE 4E: HSM (predawn) by elevation
+### FIGURE S4E: HSM (predawn) by elevation
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_4E <- data.frame()
-all_partial_4E <- data.frame()
-model_summaries_4E <- data.frame()
+all_preds_S4E <- data.frame()
+all_partial_S4E <- data.frame()
+model_summaries_S4E <- data.frame()
 
 for (sp in names(species_list_elev)) {
 
@@ -3562,7 +3514,6 @@ for (sp in names(species_list_elev)) {
                 (1|plot) + (1|wp_year),
               data = df_cc)
 
-  # ── significance ─────────────────────────────
   summ <- summary(mod)$coefficients
   elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
@@ -3572,12 +3523,11 @@ for (sp in names(species_list_elev)) {
     TRUE          ~ "Not significant"
   )
 
-  model_summaries_4E <- dplyr::bind_rows(
-    model_summaries_4E,
+  model_summaries_S4E <- dplyr::bind_rows(
+    model_summaries_S4E,
     data.frame(species = sp, p_value = elev_p, signif = signif_label)
   )
 
-  # ── prediction grid ──────────────────────────────────────
   mean_e <- mean(df_cc$elevation_ft)
   sd_e   <- sd(df_cc$elevation_ft)
 
@@ -3597,9 +3547,8 @@ for (sp in names(species_list_elev)) {
   newdata$species <- sp
   newdata$signif  <- signif_label
 
-  all_preds_4E <- dplyr::bind_rows(all_preds_4E, newdata)
+  all_preds_S4E <- dplyr::bind_rows(all_preds_S4E, newdata)
 
-  # ── partial residuals  ──────────────────────
   beta <- fixef(mod)["elevation_ft_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
 
@@ -3611,17 +3560,17 @@ for (sp in names(species_list_elev)) {
   df_cc$species <- sp
   df_cc$signif  <- signif_label
 
-  all_partial_4E <- dplyr::bind_rows(all_partial_4E, df_cc)
+  all_partial_S4E <- dplyr::bind_rows(all_partial_S4E, df_cc)
 }
 
 S4E <- ggplot() +
   geom_point(
-    data = all_partial_4E,
+    data = all_partial_S4E,
     aes(x = elevation_raw, y = partial_resid, color = species),
     alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   geom_line(
-    data = all_preds_4E,
+    data = all_preds_S4E,
     aes(x = elevation, y = pred,
         color = species, linetype = signif),
     linewidth = 1.2, na.rm = TRUE
@@ -3646,12 +3595,12 @@ S4E <- ggplot() +
   )
 S4E
 
-### FIGURE 4F: HSM (midday) by elevation
+### FIGURE S4F: HSM (midday) by elevation
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_4F <- data.frame()
-all_partial_4F <- data.frame()
-model_summaries_4F <- data.frame()
+all_preds_S4F <- data.frame()
+all_partial_S4F <- data.frame()
+model_summaries_S4F <- data.frame()
 
 for (sp in names(species_list_elev)) {
 
@@ -3671,7 +3620,6 @@ for (sp in names(species_list_elev)) {
                 (1|plot) + (1|wp_year),
               data = df_cc)
 
-  # ── significance ─────────────────────────────────────────
   summ <- summary(mod)$coefficients
   elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
 
@@ -3681,12 +3629,11 @@ for (sp in names(species_list_elev)) {
     TRUE          ~ "Not significant"
   )
 
-  model_summaries_4F <- dplyr::bind_rows(
-    model_summaries_4F,
+  model_summaries_S4F <- dplyr::bind_rows(
+    model_summaries_S4F,
     data.frame(species = sp, p_value = elev_p, signif = signif_label)
   )
 
-  # ── predictions ──────────────────────────────────────────
   mean_e <- mean(df_cc$elevation_ft)
   sd_e   <- sd(df_cc$elevation_ft)
 
@@ -3706,9 +3653,8 @@ for (sp in names(species_list_elev)) {
   newdata$species <- sp
   newdata$signif  <- signif_label
 
-  all_preds_4F <- dplyr::bind_rows(all_preds_4F, newdata)
+  all_preds_S4F <- dplyr::bind_rows(all_preds_S4F, newdata)
 
-  # ── partial residuals ────────────────────────────────────
   beta <- fixef(mod)["elevation_ft_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
 
@@ -3720,17 +3666,17 @@ for (sp in names(species_list_elev)) {
   df_cc$species <- sp
   df_cc$signif  <- signif_label
 
-  all_partial_4F <- dplyr::bind_rows(all_partial_4F, df_cc)
+  all_partial_S4F <- dplyr::bind_rows(all_partial_S4F, df_cc)
 }
 
 S4F <- ggplot() +
   geom_point(
-    data = all_partial_4F,
+    data = all_partial_S4F,
     aes(x = elevation_raw, y = partial_resid, color = species),
     alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   geom_line(
-    data = all_preds_4F,
+    data = all_preds_S4F,
     aes(x = elevation, y = pred,
         color = species, linetype = signif),
     linewidth = 1.2, na.rm = TRUE
@@ -3755,12 +3701,12 @@ S4F <- ggplot() +
   )
 S4F
 
-### FIGURE 4G: HSM (midday) by canopy closure
+### FIGURE S4G: HSM (midday) by canopy closure
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_4G <- data.frame()
-all_partial_4G <- data.frame()
-model_summaries_4G <- data.frame()
+all_preds_S4G <- data.frame()
+all_partial_S4G <- data.frame()
+model_summaries_S4G <- data.frame()
 
 for (sp in names(species_list)) {
 
@@ -3790,7 +3736,6 @@ for (sp in names(species_list)) {
                 data = df_cc)
   }
 
-  # ── significance ─────────────────────────────────────────
   summ <- summary(mod)$coefficients
   pd_p <- summ["predawn_scaled", "Pr(>|t|)"]
 
@@ -3800,8 +3745,8 @@ for (sp in names(species_list)) {
     TRUE        ~ "Not significant"
   )
 
-  model_summaries_4G <- dplyr::bind_rows(
-    model_summaries_4G,
+  model_summaries_S4G <- dplyr::bind_rows(
+    model_summaries_S4G,
     data.frame(species = sp, p_value = pd_p, signif = signif_label)
   )
 
@@ -3826,7 +3771,7 @@ for (sp in names(species_list)) {
   newdata$species <- sp
   newdata$signif  <- signif_label
 
-  all_preds_4G <- dplyr::bind_rows(all_preds_4G, newdata)
+  all_preds_S4G <- dplyr::bind_rows(all_preds_S4G, newdata)
 
   # ── partial residuals ────────────────────────────────────
   beta <- fixef(mod)["predawn_scaled"]
@@ -3840,17 +3785,17 @@ for (sp in names(species_list)) {
   df_cc$species <- sp
   df_cc$signif  <- signif_label
 
-  all_partial_4G <- dplyr::bind_rows(all_partial_4G, df_cc)
+  all_partial_S4G <- dplyr::bind_rows(all_partial_S4G, df_cc)
 }
 
 S4G <- ggplot() +
   geom_point(
-    data = all_partial_4G,
+    data = all_partial_S4G,
     aes(x = -predawn_raw, y = partial_resid, color = species),
     alpha = 0.15, size = 2, na.rm = TRUE
   ) +
   geom_line(
-    data = all_preds_4G,
+    data = all_preds_S4G,
     aes(x = -predawn, y = pred,
         color = species, linetype = signif),
     linewidth = 1.2, na.rm = TRUE
@@ -3885,12 +3830,12 @@ grid.arrange(S4A, S4B, S4C, S4D, S4E, S4F, blank_plot, S4G, ncol =2, nrow = 4)
 ```
 ### growth
 ```{r}
-### FIGURE 5A: Internode length by diameter
+### FIGURE S5A: Internode length by diameter
 ## plotting model fit trend lines and partial residuals data points
 
-all_preds_5A   <- data.frame()
-all_partial_5A <- data.frame()
-model_summaries_5A <- data.frame()
+all_preds_S5A   <- data.frame()
+all_partial_S5A <- data.frame()
+model_summaries_S5A <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -3917,8 +3862,8 @@ for (sp in names(species_list)) {
     diam_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-  model_summaries_5A <- dplyr::bind_rows(
-    model_summaries_5A,
+  model_summaries_S5A <- dplyr::bind_rows(
+    model_summaries_S5A,
     data.frame(species = sp, p_value = diam_p, signif = signif_label)
   )
 
@@ -3936,7 +3881,7 @@ for (sp in names(species_list)) {
   newdata$pred <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif <- signif_label
-  all_preds_5A <- dplyr::bind_rows(all_preds_5A, newdata)
+  all_preds_S5A <- dplyr::bind_rows(all_preds_S5A, newdata)
 
   beta_diam      <- fixef(mod)["diameter_complete_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -3946,14 +3891,14 @@ for (sp in names(species_list)) {
   df_cc$diameter_cm <- df_cc$diameter_complete
   df_cc$species <- sp
   df_cc$signif  <- signif_label
-  all_partial_5A <- dplyr::bind_rows(all_partial_5A, df_cc)
+  all_partial_S5A <- dplyr::bind_rows(all_partial_S5A, df_cc)
 }
 
 S5A <- ggplot() +
-  geom_point(data = all_partial_5A,
+  geom_point(data = all_partial_S5A,
              aes(x = diameter_cm, y = partial_resid, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_5A,
+  geom_line(data = all_preds_S5A,
             aes(x = diameter_cm, y = pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -3966,11 +3911,11 @@ S5A <- ggplot() +
         legend.position  = "none")
 
 
-### FIGURE 5B: Internode length by predawn 
+### FIGURE S5B: Internode length by predawn 
 ## plotting model fit trend lines and partial residuals data points
-all_preds_5B   <- data.frame()
-all_partial_5B <- data.frame()
-model_summaries_5B <- data.frame()
+all_preds_S5B   <- data.frame()
+all_partial_S5B <- data.frame()
+model_summaries_S5B <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -3995,7 +3940,7 @@ for (sp in names(species_list)) {
     pd_p < 0.1  ~ "Marginal",
     TRUE        ~ "Not significant"
   )
-  model_summaries_5B <- dplyr::bind_rows(model_summaries_5B,
+  model_summaries_S5B <- dplyr::bind_rows(model_summaries_S5B,
                                          data.frame(species = sp, p_value = pd_p, signif = signif_label))
 
   mean_pd <- mean(df_cc$predawn_MPa_combined, na.rm = TRUE)
@@ -4010,7 +3955,7 @@ for (sp in names(species_list)) {
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
-  all_preds_5B <- dplyr::bind_rows(all_preds_5B, newdata)
+  all_preds_S5B <- dplyr::bind_rows(all_preds_S5B, newdata)
 
   beta_pd        <- fixef(mod)["predawn_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -4020,14 +3965,14 @@ for (sp in names(species_list)) {
   df_cc$predawn  <- df_cc$predawn_MPa_combined
   df_cc$species  <- sp
   df_cc$signif   <- signif_label
-  all_partial_5B <- dplyr::bind_rows(all_partial_5B, df_cc)
+  all_partial_S5B <- dplyr::bind_rows(all_partial_S5B, df_cc)
 }
 
 S5B <- ggplot() +
-  geom_point(data = all_partial_5B,
+  geom_point(data = all_partial_S5B,
              aes(x = predawn, y = partial_resid, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_5B,
+  geom_line(data = all_preds_S5B,
             aes(x = predawn, y = pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -4041,10 +3986,11 @@ S5B <- ggplot() +
         legend.position  = "none")
 
 
-# ── Fig5C: Internode length ~ HSM_midday ─────────────────────────────────────
-all_preds_5C   <- data.frame()
-all_partial_5C <- data.frame()
-model_summaries_5C <- data.frame()
+### FIGURE S5C: Internode length by HSM_midday
+## plotting model fit trend lines and partial residuals data points  ─────────────────────────────────────
+all_preds_S5C   <- data.frame()
+all_partial_S5C <- data.frame()
+model_summaries_S5C <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -4069,7 +4015,7 @@ for (sp in names(species_list)) {
     hsm_p < 0.1  ~ "Marginal",
     TRUE         ~ "Not significant"
   )
-  model_summaries_5C <- dplyr::bind_rows(model_summaries_5C,
+  model_summaries_S5C <- dplyr::bind_rows(model_summaries_S5C,
                                          data.frame(species = sp, p_value = hsm_p, signif = signif_label))
 
   mean_hsm <- mean(df_cc$HSM_midday_P50_mean, na.rm = TRUE)
@@ -4084,7 +4030,7 @@ for (sp in names(species_list)) {
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
-  all_preds_5C <- dplyr::bind_rows(all_preds_5C, newdata)
+  all_preds_S5C <- dplyr::bind_rows(all_preds_S5C, newdata)
 
   beta_hsm       <- fixef(mod)["HSM_midday_P50_mean_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -4094,14 +4040,14 @@ for (sp in names(species_list)) {
   df_cc$HSM_midday_P50_mean <- df_cc$HSM_midday_P50_mean
   df_cc$species  <- sp
   df_cc$signif   <- signif_label
-  all_partial_5C <- dplyr::bind_rows(all_partial_5C, df_cc)
+  all_partial_S5C <- dplyr::bind_rows(all_partial_S5C, df_cc)
 }
 
 S5C <- ggplot() +
-  geom_point(data = all_partial_5C,
+  geom_point(data = all_partial_S5C,
              aes(x = HSM_midday_P50_mean, y = partial_resid, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_5C,
+  geom_line(data = all_preds_S5C,
             aes(x = HSM_midday_P50_mean, y = pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -4113,11 +4059,11 @@ S5C <- ggplot() +
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
-
-# ── Fig5D: Internode length ~ P50 ────────────────────────────────────────────
-all_preds_5D   <- data.frame()
-all_partial_5D <- data.frame()
-model_summaries_5D <- data.frame()
+### FIGURE S5D: Internode length by P50 
+## plotting model fit trend lines and partial residuals data points
+all_preds_S5D   <- data.frame()
+all_partial_S5D <- data.frame()
+model_summaries_S5D <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -4142,7 +4088,7 @@ for (sp in names(species_list)) {
     p50_p < 0.1  ~ "Marginal",
     TRUE         ~ "Not significant"
   )
-  model_summaries_5D <- dplyr::bind_rows(model_summaries_5D,
+  model_summaries_S5D <- dplyr::bind_rows(model_summaries_S5D,
                                          data.frame(species = sp, p_value = p50_p, signif = signif_label))
 
   mean_P50 <- mean(df_cc$P50_combined, na.rm = TRUE)
@@ -4157,7 +4103,7 @@ for (sp in names(species_list)) {
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
-  all_preds_5D <- dplyr::bind_rows(all_preds_5D, newdata)
+  all_preds_S5D <- dplyr::bind_rows(all_preds_S5D, newdata)
 
   beta_p50       <- fixef(mod)["P50_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -4167,14 +4113,14 @@ for (sp in names(species_list)) {
   df_cc$P50_raw  <- df_cc$P50_combined
   df_cc$species  <- sp
   df_cc$signif   <- signif_label
-  all_partial_5D <- dplyr::bind_rows(all_partial_5D, df_cc)
+  all_partial_S5D <- dplyr::bind_rows(all_partial_S5D, df_cc)
 }
 
 S5D <- ggplot() +
-  geom_point(data = all_partial_5D,
+  geom_point(data = all_partial_S5D,
              aes(x = P50_raw, y = partial_resid, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_5D,
+  geom_line(data = all_preds_S5D,
             aes(x = P50_raw, y = pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -4187,11 +4133,11 @@ S5D <- ggplot() +
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
-
-# ── Fig5E: Internode length ~ canopy closure ─────────────────────────────────
-all_preds_5E   <- data.frame()
-all_partial_5E <- data.frame()
-model_summaries_5E <- data.frame()
+### FIGURE S5E: Internode length by canopy closure 
+## plotting model fit trend lines and partial residuals data points
+all_preds_S5E   <- data.frame()
+all_partial_S5E <- data.frame()
+model_summaries_S5E <- data.frame()
 
 for (sp in names(species_list)) {
   df <- species_list[[sp]]
@@ -4216,7 +4162,7 @@ for (sp in names(species_list)) {
     canopy_p < 0.1  ~ "Marginal",
     TRUE            ~ "Not significant"
   )
-  model_summaries_5E <- dplyr::bind_rows(model_summaries_5E,
+  model_summaries_S5E <- dplyr::bind_rows(model_summaries_S5E,
                                          data.frame(species = sp, p_value = canopy_p, signif = signif_label))
 
   mean_canopy <- mean(df_cc$canopy_closure, na.rm = TRUE)
@@ -4231,7 +4177,7 @@ for (sp in names(species_list)) {
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
-  all_preds_5E <- dplyr::bind_rows(all_preds_5E, newdata)
+  all_preds_S5E <- dplyr::bind_rows(all_preds_S5E, newdata)
 
   beta_canopy    <- fixef(mod)["canopy_closure_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -4241,14 +4187,14 @@ for (sp in names(species_list)) {
   df_cc$canopy   <- df_cc$canopy_closure
   df_cc$species  <- sp
   df_cc$signif   <- signif_label
-  all_partial_5E <- dplyr::bind_rows(all_partial_5E, df_cc)
+  all_partial_S5E <- dplyr::bind_rows(all_partial_S5E, df_cc)
 }
 
 S5E <- ggplot() +
-  geom_point(data = all_partial_5E,
+  geom_point(data = all_partial_S5E,
              aes(x = canopy, y = partial_resid, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_5E,
+  geom_line(data = all_preds_S5E,
             aes(x = canopy, y = pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -4260,11 +4206,11 @@ S5E <- ggplot() +
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
-
-# ── Fig5F: Internode length ~ elevation ──────────────────────────────────────
-all_preds_5F   <- data.frame()
-all_partial_5F <- data.frame()
-model_summaries_5F <- data.frame()
+### FIGURE S5F: Internode length by elevation 
+## plotting model fit trend lines and partial residuals data points
+all_preds_S5F   <- data.frame()
+all_partial_S5F <- data.frame()
+model_summaries_S5F <- data.frame()
 
 for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
@@ -4283,7 +4229,7 @@ for (sp in names(species_list_elev)) {
     elev_p < 0.1  ~ "Marginal",
     TRUE          ~ "Not significant"
   )
-  model_summaries_5F <- dplyr::bind_rows(model_summaries_5F,
+  model_summaries_S5F <- dplyr::bind_rows(model_summaries_S5F,
                                          data.frame(species = sp, p_value = elev_p, signif = signif_label))
 
   mean_elev <- mean(df_cc$elevation_ft, na.rm = TRUE)
@@ -4299,7 +4245,7 @@ for (sp in names(species_list_elev)) {
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
   newdata$signif  <- signif_label
-  all_preds_5F <- dplyr::bind_rows(all_preds_5F, newdata)
+  all_preds_S5F <- dplyr::bind_rows(all_preds_S5F, newdata)
 
   beta_elev      <- fixef(mod)["elevation_ft_scaled"]
   beta_intercept <- fixef(mod)["(Intercept)"]
@@ -4309,14 +4255,14 @@ for (sp in names(species_list_elev)) {
   df_cc$elev     <- df_cc$elevation_ft
   df_cc$species  <- sp
   df_cc$signif   <- signif_label
-  all_partial_5F <- dplyr::bind_rows(all_partial_5F, df_cc)
+  all_partial_S5F <- dplyr::bind_rows(all_partial_S5F, df_cc)
 }
 
 S5F <- ggplot() +
-  geom_point(data = all_partial_5F,
+  geom_point(data = all_partial_S5F,
              aes(x = elev, y = partial_resid, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  geom_line(data = all_preds_5F,
+  geom_line(data = all_preds_S5F,
             aes(x = elev, y = pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
@@ -4328,8 +4274,6 @@ S5F <- ggplot() +
         plot.background  = element_rect(fill = "white", color = NA),
         legend.position  = "none")
 
-
-# ── Final panel ───────────────────────────────────────────────────────────────
 grid.arrange(S5A, S5B, S5C, S5D, S5E, S5F, ncol = 2, nrow = 3)
 
 ```

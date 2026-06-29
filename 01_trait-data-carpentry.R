@@ -1,4 +1,3 @@
-
 # load raw trait data
 trait_data1 <- read.csv("yuba-phys-raw-field-data-2024_2025.csv")
 
@@ -69,7 +68,7 @@ trait_data1 <- trait_data1 %>%
 trait_data1$P50_combined <- as.numeric(as.character(trait_data1$P50_combined))
 
 
-# interpolate P50 values for individuals that P50 wasn't measured
+# interpolate P50 values for individuals that are missing P50 
 # create a training dataset
 P50_measured <- trait_data1 %>%
   filter(!is.na(P50_combined))
@@ -204,7 +203,7 @@ trait_data1$P50_mean_scaled <- as.numeric(scale(trait_data1$P50_complete))
 trait_data1$HSM_midday_P50_mean_scaled <- as.numeric(scale(trait_data1$HSM_midday_P50_mean))
 
 
-# we want to include a random/fixed effect for year, so lets make a column for that, including 'both'
+# we want to include a random effect for year, so lets make a column for that, including 'both'
 trait_data1 <- trait_data1 %>%
   mutate(wp_year = case_when(
     !is.na(predawn_MPa_2024) & is.na(predawn_MPa_2025) ~ "2024",
@@ -219,5 +218,5 @@ PILA <- trait_data1[trait_data1$species == 'PILA',]
 PIPO <- trait_data1[trait_data1$species == 'PIPO',]
 ABMA <- trait_data1[trait_data1$species == 'ABMA',]
 
-
+# write csv for prepped field data to use to downstream R scripts 
 write.csv(trait_data1, file = "yuba-phys-prepped-field-data-2024_2025.csv", row.names = FALSE)
