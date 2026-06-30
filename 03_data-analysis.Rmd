@@ -63,15 +63,6 @@ sample_sizes <- trait_data1 %>%
 
 sample_sizes
 
-trait_data1 %>%
-  filter(
-    species == "PIPO",
-    size == "seedling",
-    microsite == "sun",
-    elevation == "mid"
-  ) %>%
-  nrow()
-
 ```
 
 # site distributions
@@ -282,8 +273,12 @@ t.test(predawn_MPa_combined ~ wp_year,
 
 # table S1 models
 ```{r}
-# run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S1
+# run this model for all species 'ABCO', 'ABMA' (remove elevation as a predictor), 'PILA', 'PIPO' for results in table S1
 # run this model for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean'
+
+#'P50_combined' = P50 from both years
+#'HSM_predawn_combined' and 'HSM_midday_combined' = HSM measured in both years
+#'HSM_predawn_P50_mean' and 'HSM_midday_P50_mean' = HSM measured and predicted from both years 
 
 mod1 <- lmer(predawn_MPa_combined ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = ABCO)
 summary(mod1)
@@ -295,7 +290,7 @@ summary(mod1)
 # run this model for all species 'ABCO', 'ABMA', 'PILA', 'PIPO' for results in table S2
 # run this model for the following response variables 'P50_combined', 'HSM_midday_combined' and 'HSM_midday_P50_mean'
 
-mod2 <- lmer(P50_combined ~diameter_complete_scaled * predawn_scaled * canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = ABCO)
+mod2 <- lmer(P50_combined ~diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = ABCO)
 summary(mod2)
 
 ```
@@ -353,11 +348,11 @@ ggplot(trait_data1, aes(x = log(diameter_complete), y = log(internode_length_1_2
 
 # table S4-5 models
 ```{r}
-# run this model for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean' and 'growth_residuals' for table S4 
+# run this model for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean' and 'internode_length_1_2' for table S4 
 mod6 <- lmer(predawn_MPa_combined ~ species + diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = trait_data1)
 summary(mod6)
 
-# run this model for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean' and 'growth_residuals' for table S5
+# run this model for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined', 'P50_combined', 'HSM_predawn_combined', 'HSM_predawn_P50_mean', 'HSM_midday_combined' and 'HSM_midday_P50_mean' and 'internode_length_1_2' for table S5
 mod7 <- lmer(predawn_MPa_combined ~ species * diameter_complete_scaled * elevation_ft_scaled * canopy_closure_scaled + (1|plot) + (1|wp_year), data = trait_data1)
 summary(mod7)
 
