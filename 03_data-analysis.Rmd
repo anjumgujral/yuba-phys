@@ -57,6 +57,21 @@ ggplot(trait_data1, aes(x = diameter_complete, fill = size)) +
     panel.grid.major = element_blank(), 
     panel.grid.minor = element_blank())
 
+# tally number of individuals per species, size, light environment and elevation  
+sample_sizes <- trait_data1 %>%
+  count(species, size, microsite, elevation)
+
+sample_sizes
+
+trait_data1 %>%
+  filter(
+    species == "PIPO",
+    size == "seedling",
+    microsite == "sun",
+    elevation == "mid"
+  ) %>%
+  nrow()
+
 ```
 
 # site distributions
@@ -85,7 +100,7 @@ ggplot(trait_data1, aes(x = elevation, y = canopy_closure, fill = microsite)) +
     panel.grid.minor = element_blank())+
   scale_fill_manual(values = c("skyblue", "lightgreen", "purple"))
 
-# create a new variable combining size_class and elevation
+# create a new variable combining size and elevation
 trait_data1$size_elevation <- interaction(trait_data1$size, trait_data1$elevation)
 
 # are seedlings and saplings of each species equally distributed across canopy closure?
@@ -366,11 +381,35 @@ trait_data2 <- merge(trait_data1, bcm_climate, by.x = "plot", by.y="id")
 trait_data2$cwd_scaled <- as.vector(scale(trait_data2$cwd))
 trait_data2$ppt_scaled <- as.vector(scale(trait_data2$ppt))
 
-# run this model for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined'
-mod8 <- lmer(predawn_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + ppt_scaled + (1|plot) + (1|wp_year), data = trait_data2)
+# run these models (cwd, ppt) for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined' 
+mod8 <- lmer(predawn_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + cwd_scaled + (1|plot) + (1|wp_year), data = trait_data2)
 summary(mod8)
+
+mod9 <- lmer(predawn_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + ppt_scaled + (1|plot) + (1|wp_year), data = trait_data2)
+summary(mod9)
 
 ```
 
+#table S9 models
+```{r}
+# run '05_climate-extraction.R' before running the following script
+
+# load site data 
+site_data <- read.csv("site_data.csv")
+
+#merge climate data with seedling physiology data for the following analyses
+trait_data3 <- merge(trait_data1, site_data, by.x = "plot", by.y="id")
+
+trait_data3$hli_scaled <- as.vector(scale(trait_data3$hli))
+trait_data3$aspect_scaled <- as.vector(scale(trait_data3$aspect))
+
+# run these models (hli, aspect) for the following response variables: 'predawn_MPa_combined', 'midday_MPa_combined' 
+mod10 <- lmer(predawn_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + hli_scaled + (1|plot) + (1|wp_year), data = trait_data3)
+summary(mod10)
+
+mod11 <- lmer(predawn_MPa_combined~ diameter_complete_scaled + canopy_closure_scaled + aspect_scaled + (1|plot) + (1|wp_year), data = trait_data3)
+summary(mod11)
+
+```
 
 
