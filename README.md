@@ -4,7 +4,7 @@ Tree physiology & functional traits along tree size and climatic gradients in th
 
 ## Data management approach for this repo
 
-The data are stored in Dryad: DOI: 10.5061/dryad.w9ghx3g4m. Copy this folder to your computer, and download data to the location of this folder on your computer.
+The data are stored in Dryad: https://doi.org/10.5061/dryad.w9ghx3g4m. Copy this folder to your computer, and download data to the location of this folder on your computer.
 
 ## Analysis approach
 
