@@ -3163,8 +3163,7 @@ for (sp in names(species_list)) {
 
   vars <- c("HSM_predawn_P50_mean",
             "canopy_closure_scaled",
-            "diameter_complete_scaled",
-            "predawn_scaled")
+            "diameter_complete_scaled")
 
   if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
 
@@ -3172,11 +3171,11 @@ for (sp in names(species_list)) {
 
   if (sp == "ABMA") {
     mod <- lmer(HSM_predawn_P50_mean ~ canopy_closure_scaled +
-                  diameter_complete_scaled + predawn_scaled +
+                  diameter_complete_scaled +
                   (1|plot) + (1|wp_year), data = df_cc)
   } else {
     mod <- lmer(HSM_predawn_P50_mean ~ canopy_closure_scaled +
-                  diameter_complete_scaled + predawn_scaled +
+                  diameter_complete_scaled +
                   elevation_ft_scaled +
                   (1|plot) + (1|wp_year), data = df_cc)
   }
@@ -3203,8 +3202,7 @@ for (sp in names(species_list)) {
 
   newdata <- data.frame(
     canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
-    diameter_complete_scaled = 0,
-    predawn_scaled = 0
+    diameter_complete_scaled = 0
   )
   if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
 
@@ -3264,8 +3262,7 @@ for (sp in names(species_list)) {
 
   vars <- c("HSM_midday_P50_mean",
             "canopy_closure_scaled",
-            "diameter_complete_scaled",
-            "predawn_scaled")
+            "diameter_complete_scaled")
 
   if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
 
@@ -3273,11 +3270,11 @@ for (sp in names(species_list)) {
 
   if (sp == "ABMA") {
     mod <- lmer(HSM_midday_P50_mean ~ canopy_closure_scaled +
-                  diameter_complete_scaled + predawn_scaled +
+                  diameter_complete_scaled +
                   (1|plot) + (1|wp_year), data = df_cc)
   } else {
     mod <- lmer(HSM_midday_P50_mean ~ canopy_closure_scaled +
-                  diameter_complete_scaled + predawn_scaled +
+                  diameter_complete_scaled + 
                   elevation_ft_scaled +
                   (1|plot) + (1|wp_year), data = df_cc)
   }
@@ -3305,8 +3302,7 @@ for (sp in names(species_list)) {
 
   newdata <- data.frame(
     canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
-    diameter_complete_scaled = 0,
-    predawn_scaled = 0
+    diameter_complete_scaled = 0
   )
   if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
 
@@ -3367,13 +3363,12 @@ for (sp in names(species_list_elev)) {
   vars <- c("HSM_predawn_P50_mean",
             "elevation_ft_scaled",
             "diameter_complete_scaled",
-            "predawn_scaled",
             "canopy_closure_scaled")
 
   df_cc <- df[complete.cases(df[, vars]), ]
 
   mod <- lmer(HSM_predawn_P50_mean ~ elevation_ft_scaled +
-                diameter_complete_scaled + predawn_scaled +
+                diameter_complete_scaled + 
                 canopy_closure_scaled +
                 (1|plot) + (1|wp_year),
               data = df_cc)
@@ -3402,7 +3397,6 @@ for (sp in names(species_list_elev)) {
   newdata <- data.frame(
     elevation_ft_scaled = (elev_seq - mean_e)/sd_e,
     diameter_complete_scaled = 0,
-    predawn_scaled = 0,
     canopy_closure_scaled = 0
   )
 
@@ -3473,13 +3467,12 @@ for (sp in names(species_list_elev)) {
   vars <- c("HSM_midday_P50_mean",
             "elevation_ft_scaled",
             "diameter_complete_scaled",
-            "predawn_scaled",
             "canopy_closure_scaled")
 
   df_cc <- df[complete.cases(df[, vars]), ]
 
   mod <- lmer(HSM_midday_P50_mean ~ elevation_ft_scaled +
-                diameter_complete_scaled + predawn_scaled +
+                diameter_complete_scaled + 
                 canopy_closure_scaled +
                 (1|plot) + (1|wp_year),
               data = df_cc)
@@ -3508,7 +3501,6 @@ for (sp in names(species_list_elev)) {
   newdata <- data.frame(
     elevation_ft_scaled = (elev_seq - mean_e)/sd_e,
     diameter_complete_scaled = 0,
-    predawn_scaled = 0,
     canopy_closure_scaled = 0
   )
 
@@ -3614,7 +3606,6 @@ for (sp in names(species_list)) {
     data.frame(species = sp, p_value = pd_p, signif = signif_label)
   )
 
-  # ── predictions ──────────────────────────────────────────
   mean_pd <- mean(df_cc$predawn_MPa_combined)
   sd_pd   <- sd(df_cc$predawn_MPa_combined)
 
@@ -3637,7 +3628,6 @@ for (sp in names(species_list)) {
 
   all_preds_S4G <- dplyr::bind_rows(all_preds_S4G, newdata)
 
-  # ── partial residuals ────────────────────────────────────
   beta <- fixef(mod)["predawn_scaled"]
   intercept <- fixef(mod)["(Intercept)"]
 
@@ -3705,17 +3695,17 @@ for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
   vars <- c("internode_length_1_2", "diameter_complete_scaled",
-            "predawn_scaled", "canopy_closure_scaled")
+            "predawn_scaled", "canopy_closure_scaled", "HSM_midday_P50_mean_scaled")
   if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
   df_cc <- df[complete.cases(df[, vars]), ]
 
   mod <- if (sp == "ABMA") {
     lmer(internode_length_1_2 ~ diameter_complete_scaled +
-           predawn_scaled + canopy_closure_scaled +
+           predawn_scaled + canopy_closure_scaled + HSM_midday_P50_mean_scaled +
            (1|plot), data = df_cc)
   } else {
     lmer(internode_length_1_2 ~ diameter_complete_scaled +
-           predawn_scaled + canopy_closure_scaled +
+           predawn_scaled + canopy_closure_scaled + HSM_midday_P50_mean_scaled +
            elevation_ft_scaled + (1|plot), data = df_cc)
   }
 
@@ -3738,7 +3728,8 @@ for (sp in names(species_list)) {
   newdata <- data.frame(
     diameter_complete_scaled = (diam_seq - mean_d)/sd_d,
     predawn_scaled = 0,
-    canopy_closure_scaled = 0
+    canopy_closure_scaled = 0,
+    HSM_midday_P50_mean_scaled = 0
   )
   if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
   newdata$diameter_cm <- diam_seq
@@ -3785,15 +3776,15 @@ for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
   vars <- c("internode_length_1_2", "predawn_scaled",
-            "canopy_closure_scaled", "diameter_complete_scaled")
+            "canopy_closure_scaled", "diameter_complete_scaled", "HSM_midday_P50_mean_scaled")
   if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
   df_cc <- df[complete.cases(df[, vars]), ]
 
   mod <- if (sp == "ABMA") {
-    lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled +
+    lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled + HSM_midday_P50_mean_scaled +
            diameter_complete_scaled + (1|plot), data = df_cc)
   } else {
-    lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled +
+    lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled + HSM_midday_P50_mean_scaled +
            elevation_ft_scaled + diameter_complete_scaled + (1|plot), data = df_cc)
   }
 
@@ -3813,7 +3804,7 @@ for (sp in names(species_list)) {
                  max(df_cc$predawn_MPa_combined, na.rm = TRUE), length.out = 100)
 
   newdata <- data.frame(predawn_scaled = (pd_seq - mean_pd)/sd_pd,
-                        canopy_closure_scaled = 0, diameter_complete_scaled = 0)
+                        canopy_closure_scaled = 0, diameter_complete_scaled = 0, HSM_midday_P50_mean_scaled = 0)
   if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
   newdata$predawn <- pd_seq
   newdata$pred    <- predict(mod, newdata, re.form = NA)
@@ -3851,7 +3842,7 @@ S5B <- ggplot() +
 
 
 ### FIGURE S5C: Internode length by HSM_midday
-## plotting model fit trend lines and partial residuals data points  ─────────────────────────────────────
+## plotting model fit trend lines and partial residuals data points 
 all_preds_S5C   <- data.frame()
 all_partial_S5C <- data.frame()
 model_summaries_S5C <- data.frame()
@@ -4007,16 +3998,15 @@ for (sp in names(species_list)) {
   df <- species_list[[sp]]
 
   vars <- c("internode_length_1_2", "canopy_closure_scaled",
-            "diameter_complete_scaled", "predawn_scaled")
+            "diameter_complete_scaled", "predawn_scaled", "HSM_midday_P50_mean_scaled")
   if (sp != "ABMA") vars <- c(vars, "elevation_ft_scaled")
   df_cc <- df[complete.cases(df[, vars]), ]
 
   mod <- if (sp == "ABMA") {
-    lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled +
-           predawn_scaled + (1|plot), data = df_cc)
+    lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + HSM_midday_P50_mean_scaled + predawn_scaled + (1|plot), data = df_cc)
   } else {
     lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled +
-           predawn_scaled + elevation_ft_scaled + (1|plot), data = df_cc)
+           predawn_scaled + elevation_ft_scaled + HSM_midday_P50_mean_scaled + (1|plot), data = df_cc)
   }
 
   summ     <- summary(mod)$coefficients
@@ -4035,7 +4025,7 @@ for (sp in names(species_list)) {
                      max(df_cc$canopy_closure, na.rm = TRUE), length.out = 100)
 
   newdata <- data.frame(canopy_closure_scaled = (canopy_seq - mean_canopy)/sd_canopy,
-                        diameter_complete_scaled = 0, predawn_scaled = 0)
+                        diameter_complete_scaled = 0, predawn_scaled = 0, HSM_midday_P50_mean_scaled = 0)
   if (sp != "ABMA") newdata$elevation_ft_scaled <- 0
   newdata$canopy  <- canopy_seq
   newdata$pred    <- predict(mod, newdata, re.form = NA)
@@ -4080,11 +4070,10 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   vars <- c("internode_length_1_2", "elevation_ft_scaled",
-            "diameter_complete_scaled", "predawn_scaled", "canopy_closure_scaled")
+            "diameter_complete_scaled", "predawn_scaled", "canopy_closure_scaled", "HSM_midday_P50_mean_scaled")
   df_cc <- df[complete.cases(df[, vars]), ]
 
-  mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled +
-                canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df_cc)
+  mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df_cc)
 
   summ   <- summary(mod)$coefficients
   elev_p <- summ["elevation_ft_scaled", "Pr(>|t|)"]
@@ -4104,7 +4093,8 @@ for (sp in names(species_list_elev)) {
   newdata <- data.frame(elevation_ft_scaled     = (elev_seq - mean_elev)/sd_elev,
                         diameter_complete_scaled = 0,
                         predawn_scaled           = 0,
-                        canopy_closure_scaled    = 0)
+                        canopy_closure_scaled    = 0,
+                        HSM_midday_P50_mean_scaled = 0)
   newdata$elev    <- elev_seq
   newdata$pred    <- predict(mod, newdata, re.form = NA)
   newdata$species <- sp
