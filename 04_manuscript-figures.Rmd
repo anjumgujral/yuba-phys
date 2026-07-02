@@ -39,8 +39,6 @@ species_colors <- setNames(
 )
 
 
-line_colors <- colorspace::darken(species_colors, amount = 0.1)
-
 species_list <- list(
   "ABCO" = ABCO,
   "ABMA" = ABMA,
