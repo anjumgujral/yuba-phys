@@ -123,8 +123,6 @@ Fig1A <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = diameter_complete, y = predawn_MPa_combined, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(
   data = all_preds_1A,
   aes(x = diameter_cm, y = pred,
@@ -138,11 +136,6 @@ scale_linetype_manual(values = c(
   "Significant"     = "solid",
   "Marginal"        = "dashed",
   "Not significant" = "dotted"
-)) +
-scale_alpha_manual(values = c(
-  "Significant"     = 1.0,
-  "Marginal"        = 0.7,
-  "Not significant" = 0.35
 )) +
   scale_y_reverse(
   labels = function(x) paste0("\u2212", x)
@@ -242,11 +235,6 @@ scale_linetype_manual(values = c(
   "Significant"     = "solid",
   "Marginal"        = "dashed",
   "Not significant" = "dotted"
-)) + 
-  scale_alpha_manual(values = c(
-  "Significant"     = 1.0,
-  "Marginal"        = 0.7,
-  "Not significant" = 0.35
 )) +  
   scale_y_reverse(
   labels = function(x) paste0("\u2212", x)
@@ -346,8 +334,6 @@ Fig2A <- ggplot() +
   geom_point(data = trait_data1,
              aes(x = diameter_complete, y = P50_combined, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(
   data = all_preds_2A,
   aes(x = diameter_cm, y = pred,
@@ -361,11 +347,6 @@ scale_linetype_manual(values = c(
   "Significant"     = "solid",
   "Marginal"        = "dashed",
   "Not significant" = "dotted"
-)) +
-scale_alpha_manual(values = c(
-  "Significant"     = 1.0,
-  "Marginal"        = 0.7,
-  "Not significant" = 0.35
 )) +
   scale_y_reverse(
   labels = function(x) paste0("\u2212", x)
@@ -459,17 +440,10 @@ Fig2B <- ggplot() +
             aes(x = predawn, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
-  new_scale_color() +
-  scale_color_manual(values = species_colors) +
 scale_linetype_manual(values = c(
   "Significant"     = "solid",
   "Marginal"        = "dashed",
   "Not significant" = "dotted"
-)) +
-scale_alpha_manual(values = c(
-  "Significant"     = 1.0,
-  "Marginal"        = 0.7,
-  "Not significant" = 0.35
 )) +
   scale_y_reverse(
   labels = function(x) paste0("\u2212", x)
@@ -567,17 +541,10 @@ Fig2C <- ggplot() +
             aes(x = canopy_closure, y = pred, color = species, linetype = signif),
             size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
-  new_scale_color() +
-  scale_color_manual(values = species_colors) +
 scale_linetype_manual(values = c(
   "Significant"     = "solid",
   "Marginal"        = "dashed",
   "Not significant" = "dotted"
-)) +
-scale_alpha_manual(values = c(
-  "Significant"     = 1.0,
-  "Marginal"        = 0.7,
-  "Not significant" = 0.35
 )) +
   scale_y_reverse(
   labels = function(x) paste0("\u2212", x)
@@ -661,11 +628,6 @@ Fig2D <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   scale_y_reverse(labels = function(x) paste0("\u2212", x)) +
   labs(x = "Elevation (ft)", y = expression(P[50]~"(MPa)")) +
   theme(
@@ -676,7 +638,7 @@ Fig2D <- ggplot() +
     plot.background = element_rect(fill = "white", color = NA),
     legend.position = "none"
   )
-
+Fig2D
 grid.arrange(Fig2A, Fig2B, Fig2C, Fig2D, ncol=2, nrow=2)
 ```
 
@@ -750,11 +712,6 @@ Fig3A <- ggplot() +
     "Significant"     = "solid",
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
-  )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
   )) +
   labs(x = "Basal diameter (cm)",
        y = expression(HSM[predawn]~"(MPa)")) + 
@@ -837,11 +794,6 @@ Fig3B <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   labs(x = "Basal diameter (cm)",
        y = expression(HSM[midday]~"(MPa)")) + 
   theme(
@@ -877,10 +829,10 @@ for (sp in names(species_list)) {
 
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
+    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled +
                   (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
+    mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled +
                   elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
@@ -911,14 +863,12 @@ for (sp in names(species_list)) {
   if (sp == "ABMA") {
     newdata <- data.frame(
       canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
-      diameter_complete_scaled = 0,
-      predawn_scaled = 0
+      diameter_complete_scaled = 0
     )
   } else {
     newdata <- data.frame(
       canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
       diameter_complete_scaled = 0,
-      predawn_scaled = 0,
       elevation_ft_scaled = 0
     )
   }
@@ -945,11 +895,6 @@ Fig3C <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   labs(x = "Canopy closure (%)",
        y = expression(HSM[predawn]~"(MPa)"))  + 
   theme(
@@ -972,10 +917,10 @@ for (sp in names(species_list)) {
 
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
+    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled +
                   (1|plot) + (1|wp_year), data = df)
   } else {
-    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled +
+    mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled +
                   elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
   }
 
@@ -1006,14 +951,12 @@ for (sp in names(species_list)) {
   if (sp == "ABMA") {
     newdata <- data.frame(
       canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
-      diameter_complete_scaled = 0,
-      predawn_scaled = 0
+      diameter_complete_scaled = 0
     )
   } else {
     newdata <- data.frame(
       canopy_closure_scaled = (cc_seq - mean_cc)/sd_cc,
       diameter_complete_scaled = 0,
-      predawn_scaled = 0,
       elevation_ft_scaled = 0
     )
   }
@@ -1040,11 +983,6 @@ Fig3D <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   labs(x = "Canopy closure (%)",
        y = expression(HSM[midday]~"(MPa)"))+ 
   theme(
@@ -1070,7 +1008,7 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   # Fit model
-  mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
+  mod <- lmer(HSM_predawn_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
 
   # Extract fixed-effect p-value for elevation
   summ <- summary(mod)$coefficients
@@ -1099,7 +1037,6 @@ for (sp in names(species_list_elev)) {
   newdata <- data.frame(
     elevation_ft_scaled = (elev_seq - mean_elev)/sd_elev,
     diameter_complete_scaled = 0,
-    predawn_scaled = 0,
     canopy_closure_scaled = 0
   )
 
@@ -1125,11 +1062,6 @@ Fig3E <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   labs(x = "Elevation (ft)",
        y = expression(HSM[predawn]~"(MPa)"))+ 
   theme(
@@ -1151,7 +1083,7 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   # Fit model
-  mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
+  mod <- lmer(HSM_midday_P50_mean ~ diameter_complete_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot) + (1|wp_year), data = df)
 
   # Extract fixed-effect p-value for elevation
   summ <- summary(mod)$coefficients
@@ -1180,7 +1112,6 @@ for (sp in names(species_list_elev)) {
   newdata <- data.frame(
     elevation_ft_scaled = (elev_seq - mean_elev)/sd_elev,
     diameter_complete_scaled = 0,
-    predawn_scaled = 0,
     canopy_closure_scaled = 0
   )
 
@@ -1205,11 +1136,6 @@ Fig3F <- ggplot() +
     "Significant"     = "solid",
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
-  )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
   )) +
   labs(x = "Elevation (ft)",
        y = expression(HSM[midday]~"(MPa)")) + 
@@ -1245,8 +1171,11 @@ for (sp in names(species_list)) {
   # Extract fixed-effect p-value for predawn
   summ <- summary(mod)$coefficients
   pd_p <- summ["predawn_scaled", "Pr(>|t|)"]
-  signif_label <- ifelse(pd_p < 0.05, "Significant", "Not significant")
-
+  signif_label <- dplyr::case_when(
+  pd_p < 0.05 ~ "Significant",
+  pd_p < 0.1  ~ "Marginal",
+  TRUE        ~ "Not significant"
+)
   model_summaries_3G <- dplyr::bind_rows(model_summaries_3G,
                                       data.frame(species = sp,
                                                  p_value = pd_p,
@@ -1299,11 +1228,6 @@ Fig3G <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   scale_x_reverse(
     labels = function(x) paste0("\u2212", abs(x))
   ) +
@@ -1340,12 +1264,10 @@ for (sp in names(species_list)) {
   
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled +
-                  canopy_closure_scaled + (1|plot),
+    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + (1|plot),
                 data = df)
   } else {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled +
-                  canopy_closure_scaled + elevation_ft_scaled + (1|plot),
+    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot),
                 data = df)
   }
   
@@ -1379,14 +1301,16 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       diameter_complete_scaled = (diam_seq - mean_diam) / sd_diam,
       predawn_scaled = 0,
-      canopy_closure_scaled = 0
+      canopy_closure_scaled = 0,
+      HSM_midday_P50_mean_scaled = 0
     )
   } else {
     newdata <- data.frame(
       diameter_complete_scaled = (diam_seq - mean_diam) / sd_diam,
       predawn_scaled = 0,
       canopy_closure_scaled = 0,
-      elevation_ft_scaled = 0
+      elevation_ft_scaled = 0,
+      HSM_midday_P50_mean_scaled = 0
     )
   }
   
@@ -1405,20 +1329,13 @@ Fig4A <- ggplot() +
              aes(x = diameter_complete, y = internode_length_1_2, color = species),
              alpha = 0.15, size = 2, na.rm = TRUE) +
   geom_line(data = all_preds_4A,
-            aes(x = diameter_complete, y = pred, color = species, linetype = signif,
-      alpha = signif),
-            size = 1.2, na.rm = TRUE) +
+            aes(x = diameter_complete, y = pred, color = species, linetype = signif), size = 1.2, na.rm = TRUE) +
   scale_color_manual(values = species_colors) +
   scale_linetype_manual(values = c(
     "Significant"     = "solid",
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
-  )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
+  )) + 
   labs(x = "Basal diameter (cm)", y = "Internode length (cm)")  +
   theme(
     panel.background = element_rect(fill = "white", color = NA),
@@ -1444,10 +1361,10 @@ for (sp in names(species_list)) {
 
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled + diameter_complete_scaled +
+    mod <- lmer(internode_length_1_2 ~ predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + diameter_complete_scaled +
                   (1|plot), data = df)
   } else {
-    mod <- lmer(internode_length_1_2 ~ predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + diameter_complete_scaled +
+    mod <- lmer(internode_length_1_2 ~ predawn_scaled + HSM_midday_P50_mean_scaled + canopy_closure_scaled + elevation_ft_scaled + diameter_complete_scaled +
                   (1|plot), data = df)
   }
 
@@ -1475,14 +1392,16 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       predawn_scaled = (pd_seq - mean_pd)/sd_pd,
       canopy_closure_scaled = 0,
-      diameter_complete_scaled = 0
+      diameter_complete_scaled = 0,
+      HSM_midday_P50_mean_scaled = 0
     )
   } else {
     newdata <- data.frame(
       predawn_scaled = (pd_seq - mean_pd)/sd_pd,
       canopy_closure_scaled = 0,
       elevation_ft_scaled = 0,
-      diameter_complete_scaled = 0
+      diameter_complete_scaled = 0,
+      HSM_midday_P50_mean_scaled = 0
     )
   }
 
@@ -1507,11 +1426,6 @@ Fig4B <- ggplot() +
     "Significant"     = "solid",
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
-  )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
   ))  +
   scale_x_reverse(
     labels = function(x) paste0("\u2212", abs(x))
@@ -1608,11 +1522,6 @@ Fig4C <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   labs(x = expression(HSM[midday]~"(MPa)"),
        y = "Internode length (cm)") +
   theme(
@@ -1702,11 +1611,6 @@ Fig4D <- ggplot() +
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
   )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
-  )) +
   scale_x_reverse(
     labels = function(x) paste0("\u2212", abs(x))
   ) +
@@ -1734,9 +1638,9 @@ for (sp in names(species_list)) {
   
   # Fit species-specific model
   if (sp == "ABMA") {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + predawn_scaled + (1|plot), data = df)
+    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + (1|plot), data = df)
   } else {
-    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + predawn_scaled + elevation_ft_scaled + (1|plot), data = df)
+    mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + canopy_closure_scaled + predawn_scaled + HSM_midday_P50_mean_scaled + elevation_ft_scaled + (1|plot), data = df)
   }
   
   # Extract fixed-effect p-value for canopy closure
@@ -1767,6 +1671,7 @@ for (sp in names(species_list)) {
     newdata <- data.frame(
       diameter_complete_scaled = 0,
       predawn_scaled = 0,
+      HSM_midday_P50_mean_scaled = 0,
       canopy_closure_scaled = (canopy_seq - mean_canopy)/sd_canopy
     )
   } else {
@@ -1774,7 +1679,8 @@ for (sp in names(species_list)) {
       diameter_complete_scaled = 0,
       predawn_scaled = 0,
       canopy_closure_scaled = (canopy_seq - mean_canopy)/sd_canopy,
-      elevation_ft_scaled = 0
+      elevation_ft_scaled = 0,
+      HSM_midday_P50_mean_scaled = 0
     )
   }
   
@@ -1799,11 +1705,6 @@ Fig4E <- ggplot() +
     "Significant"     = "solid",
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
-  )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
   )) +
   labs(x = "Canopy closure (%)",
        y = "Internode length (cm)")  +
@@ -1831,7 +1732,7 @@ for (sp in names(species_list_elev)) {
   df <- species_list_elev[[sp]]
 
   # Fit species-specific model
-  mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + (1|plot), data = df)
+  mod <- lmer(internode_length_1_2 ~ diameter_complete_scaled + predawn_scaled + canopy_closure_scaled + elevation_ft_scaled + HSM_midday_P50_mean_scaled + (1|plot), data = df)
 
   # Extract fixed-effect p-value for elevation
   summ <- summary(mod)$coefficients
@@ -1856,6 +1757,7 @@ for (sp in names(species_list_elev)) {
     diameter_complete_scaled = 0,
     predawn_scaled = 0,
     canopy_closure_scaled = 0,
+    HSM_midday_P50_mean_scaled = 0,
     elevation_ft_scaled = (elev_seq - mean(df$elevation_ft, na.rm = TRUE))/sd(df$elevation_ft, na.rm = TRUE)
   )
 
@@ -1880,11 +1782,6 @@ Fig4F <- ggplot() +
     "Significant"     = "solid",
     "Marginal"        = "dashed",
     "Not significant" = "dotted"
-  )) +
-  scale_alpha_manual(values = c(
-    "Significant"     = 1.0,
-    "Marginal"        = 0.7,
-    "Not significant" = 0.35
   )) +
   labs(x = "Elevation (ft)",
        y = "Internode length (cm)")  +
@@ -1950,8 +1847,6 @@ S1A <- ggplot() +
     aes(x = elevation_ft, y = predawn_MPa_2024, color = species),
     size = 2, alpha = 0.2
   ) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(
     data = all_preds_S1A,
     aes(x = elev_ft, y = pred, color = species, linetype = signif),
@@ -2037,8 +1932,6 @@ S1B <- ggplot() +
     aes(x = elevation_ft, y = midday_MPa_2024, color = species),
     size = 2, alpha = 0.2
   ) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(
     data = all_preds_S1B,
     aes(x = elev_ft, y = pred, color = species, linetype = signif),
@@ -2130,8 +2023,6 @@ S1C <- ggplot() +
     size = 2,
     alpha = 0.2
   ) +
-  scale_color_manual(values = species_colors) +
-  ggnewscale::new_scale_color() +
   geom_line(
     data = all_preds_S1C,
     aes(x = elev_ft, y = pred, color = species, linetype = signif),
@@ -2227,8 +2118,6 @@ S1D <- ggplot() +
     size = 2,
     alpha = 0.2
   ) +
-  scale_color_manual(values = species_colors) +
-  ggnewscale::new_scale_color() +
   geom_line(
     data = all_preds_S1D,
     aes(x = elev_ft, y = pred, color = species, linetype = signif),
@@ -2321,8 +2210,6 @@ S1E <- ggplot() +
     size = 2,
     alpha = 0.2
   ) +
-  scale_color_manual(values = species_colors) +
-  ggnewscale::new_scale_color() +
   geom_line(
     data = all_preds_S1E,
     aes(x = elev_ft, y = pred, color = species, linetype = signif),
@@ -2415,8 +2302,6 @@ S1F <- ggplot() +
     size = 2,
     alpha = 0.2
   ) +
-  scale_color_manual(values = species_colors) +
-  ggnewscale::new_scale_color() +
   geom_line(
     data = all_preds_S1F,
     aes(x = elev_ft, y = pred, color = species, linetype = signif),
@@ -2539,8 +2424,6 @@ S2A <- ggplot() +
     aes(x = diameter_cm, y = -partial_resid, color = species),
     alpha = 0.15, size = 2, na.rm = TRUE
   ) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(
     data = all_preds_S2A,
     aes(x = diameter_cm, y = -pred,
@@ -2652,8 +2535,6 @@ S2B <- ggplot() +
     aes(x = diameter_cm, y = -partial_resid, color = species),
     alpha = 0.15, size = 2, na.rm = TRUE
   ) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(
     data = all_preds_S2B,
     aes(x = diameter_cm, y = -pred,
@@ -2770,8 +2651,6 @@ S3A <- ggplot() +
   geom_point(data = all_partial_S3A,
              aes(x = x_var, y = -partial_resid, color = species),
              alpha = 0.15, size = 1.5, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(data = all_preds_S3A,
             aes(x = diameter_cm, y = -pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
@@ -2858,8 +2737,6 @@ S3B <- ggplot() +
   geom_point(data = all_partial_S3B,
              aes(x = -x_var, y = -partial_resid, color = species),
              alpha = 0.15, size = 1.5, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(data = all_preds_S3B,
             aes(x = -predawn, y = -pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
@@ -2947,8 +2824,6 @@ S3C <- ggplot() +
   geom_point(data = all_partial_S3C,
              aes(x = x_var, y = -partial_resid, color = species),
              alpha = 0.15, size = 1.5, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(data = all_preds_S3C,
             aes(x = canopy_closure, y = -pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
@@ -3030,8 +2905,6 @@ S3D <- ggplot() +
   geom_point(data = all_partial_S3D,
              aes(x = x_var, y = -partial_resid, color = species),
              alpha = 0.15, size = 1.5, na.rm = TRUE) +
-  scale_color_manual(values = species_colors) +
-  new_scale_color() +
   geom_line(data = all_preds_S3D,
             aes(x = elevation, y = -pred, color = species, linetype = signif),
             linewidth = 1.2, na.rm = TRUE) +
